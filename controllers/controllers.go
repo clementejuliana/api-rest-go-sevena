@@ -9,7 +9,9 @@ import (
 )
 
 func ExibirUsuario(c *gin.Context) {
-	c.JSON(200, models.Usuarios)
+	var usuarios []models.Usuario
+	databasee.DB.Find(&usuarios)
+	c.JSON(200, usuarios)
 
 }
 
@@ -31,4 +33,53 @@ func CriarNovoAluno(c *gin.Context) {
 	}
 	databasee.DB.Create(&usuario)
 	c.JSON(http.StatusOK, usuario)
+}
+
+func BuscarUsuarioPorID(c *gin.Context) {
+	var usuario models.Usuario
+	id := c.Params.ByName("id")
+	databasee.DB.First(&usuario, id)
+
+	if usuario.ID == 00 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not found": "Usuario Não encontrando"})
+		return
+	}
+	c.JSON(http.StatusOK, usuario)
+}
+
+func DeleteUsuario(c *gin.Context) {
+	var usuario models.Usuario
+	id := c.Params.ByName("id")
+	databasee.DB.Delete(&usuario, id)
+	c.JSON(http.StatusOK, gin.H{"data": "Usuario deletado com sucesso"})
+}
+
+func EditarUsuario(c *gin.Context)  {
+	var usuario models.Usuario
+	id := c.Params.ByName("id")
+	databasee.DB.First(&usuario, id)
+
+	if err := c.ShouldBindJSON(&usuario); err !=nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+    databasee.DB.Model(&usuario).UpdateColumns(usuario)
+	c.JSON(http.StatusOK, usuario)
+	
+}
+
+func BuscarUsuarioPorCPF(c *gin.Context)  {
+	var usuario models.Usuario
+	cpf := c.Param("cpf")
+	databasee.DB.Where(&models.Usuario{CPF: cpf}).First(&usuario)
+	
+	if usuario.ID == 00 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not found": "Usuario Não encontrando"})
+		return
+	}
+	c.JSON(http.StatusOK, usuario)
+
 }

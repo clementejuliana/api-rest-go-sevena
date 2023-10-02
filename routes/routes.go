@@ -11,6 +11,10 @@ r := gin.Default()
 r.GET("/usuarios", controllers.ExibirUsuario)
 r.GET("/:nome", controllers.Saudacao)
 r.POST("/usuarios", controllers.CriarNovoAluno)
+r.GET("/usuarios/:id", controllers.BuscarUsuarioPorID)
+r.DELETE("/usuarios/:id", controllers.DeleteUsuario)
+r.PATCH("/usuarios/:id", controllers.EditarUsuario)
+r.GET("usuarios/cpf/:cpf", controllers.BuscarUsuarioPorCPF)
 r.Run()
 
 }

@@ -26,4 +26,4 @@ type Usuario struct {
 }
 // criar uma lista de usuario que é referente ao tipo
 
-var Usuarios []Usuario
+//var Usuarios []Usuario
