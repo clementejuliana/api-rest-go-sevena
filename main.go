@@ -1,21 +1,39 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/clementejuliana/api-rest-go-sevena/routes"
 )
 
 func main() {
+	databasee.ConexaoBD()
+	models.Usuarios = []models.Usuario{
+		{
+			Status:       "ON",
+			Nome:         "Thiago Gouveia",
+			CPF:          "0000000000000000",
+			RG:           "470000000000",
+			Genero:       "M",
+			Email:        "THIAGO@GMAIL.COM",
+			Telefone:     "4498883406",
+			Escolaridade: "ensino medio",
+			Profissao:    "dev",
+			FotoPerfil:   "ok",
+		},
+		{
+			Status:       "ON",
+			Nome:         "Juliana",
+			CPF:          "0000000000000000",
+			RG:           "470000000000",
+			Genero:       "M",
+			Email:        "THIAGO@GMAIL.COM",
+			Telefone:     "4498883406",
+			Escolaridade: "ensino medio",
+			Profissao:    "dev",
+			FotoPerfil:   "ok",
+		},
+	}
+	routes.HandleRequests()
 
-models.Notificacaos = []models.Notificacao{
-	{NotificacaoID: 1 ,UsuarioID: 1, Conteudo: "SAI TCC, BORA PRODUDIZIR CARAMBA"},
-	{NotificacaoID: 2 ,UsuarioID: 2, Conteudo: "SAI TCC, BORA PRODUDIZIR CARAMBA"},
-}
-r := routes.SetupRouter()
-r.Run(":8000")
-	fmt.Println("Iniciando o tcc sevena finalmente")
-
-	//routes.HandleRequest()
 }

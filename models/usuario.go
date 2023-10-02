@@ -1,9 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Usuario struct {
-	UsuarioID uint64 `json:"usuario_id,omitempty"`
+	gorm.Model
 	Status string `json:"status,omitempty"`
 	Nome string `json:"nome,omitempty"`
 	CPF string `json:"cpf,omitempty"`
@@ -20,3 +24,6 @@ type Usuario struct {
 	CidadeID int `json:"cidade_id,omitempty"`
 
 }
+// criar uma lista de usuario que é referente ao tipo
+
+var Usuarios []Usuario

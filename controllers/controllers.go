@@ -1,38 +1,34 @@
 package controllers
 
 import (
-	
 	"net/http"
-	"strconv"
-	"time"
 
+	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/gin-gonic/gin"
 )
 
-func Home(c *gin.Context) {
-    c.String(http.StatusOK, "HOME PAGE %s", time.Now())
+func ExibirUsuario(c *gin.Context) {
+	c.JSON(200, models.Usuarios)
+
 }
 
-func NotificacaoTodos(c *gin.Context) {
-    c.JSON(http.StatusOK, models.Notificacaos)
+//exibir uma mensagem quando está passando um valoe não valido
+func Saudacao(c *gin.Context) {
+	nome := c.Params.ByName("nome")
+	c.JSON(200, gin.H{
+		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
+	})
 }
 
-
-
-func RetornarNotificacao(c *gin.Context) {
-    // Obter o valor do parâmetro "id" da rota
-    id := c.Param("id")
-    // Retornar o ID da notificação
-    c.String(http.StatusOK, id)
-
-// Procurar a notificação com o ID especificado
-	for _,notificacao :=range models.Notificacaos{
-		if strconv.Itoa(notificacao.NotificacaoID) ==id{
-			 // Retornar informações sobre a notificação encontrada
-			c.JSON(http.StatusOK, notificacao)
-			return
-		}
-
+// criar esse novo aluno
+func CriarNovoAluno(c *gin.Context) {
+	var usuario models.Usuario
+	if err := c.ShouldBindJSON(&usuario); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
 	}
+	databasee.DB.Create(&usuario)
+	c.JSON(http.StatusOK, usuario)
 }
