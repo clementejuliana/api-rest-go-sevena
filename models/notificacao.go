@@ -1,9 +1,12 @@
 package models
 
+import "gorm.io/gorm"
+
 type Notificacao struct {
-    NotificacaoID int `json:"notificacao_id"`
-    UsuarioID int `json:"usuario_id"`
-    Conteudo string `json:"conteudo"`
+	gorm.Model
+	UsuarioID     int `gorm:"foreignKey:UsuarioID"`
+	NotificacaoID int `json:"notificacao_id"`
+	Conteudo string `json:"conteudo"`
 }
 
 var Notificacaos []Notificacao

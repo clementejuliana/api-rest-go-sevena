@@ -1,8 +1,13 @@
 package models
 
+import "gorm.io/gorm"
+
 type Local struct {
-	LocalID int    `json:"local_id,omitempty"`
-	Status  string `json:"status,omitempty"`
-	Sala    string `json:"sala,omitempty"`
-	Setor   string `json:"setor,omitempty"`
+	gorm.Model
+    LocalID int       `json:"local_id,omitempty"`
+    Status  string    `json:"status,omitempty"`
+    Sala    string    `json:"sala,omitempty"`
+    Setor   string    `json:"setor,omitempty"`
+    Atividades []Atividade `gorm:"foreignKey:LocalID"`
+    Eventos []Evento `gorm:"foreignKey:LocalID"`
 }

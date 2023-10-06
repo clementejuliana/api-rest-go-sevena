@@ -15,6 +15,7 @@ r.GET("/usuarios/:id", controllers.BuscarUsuarioPorID)
 r.DELETE("/usuarios/:id", controllers.DeleteUsuario)
 r.PATCH("/usuarios/:id", controllers.EditarUsuario)
 r.GET("usuarios/cpf/:cpf", controllers.BuscarUsuarioPorCPF)
+r.GET("/estados", controllers.ExibirEstado)
 r.Run()
 
 }

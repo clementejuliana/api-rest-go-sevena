@@ -1,7 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 type TipoUsuario struct {
-	TipoUsuarioID int `json:"tipo_usuario_id,omitempty"`
+	gorm.Model
 	Status string `json:"status,omitempty"`
 	TipoUsuario string `json:"tipo_usuario,omitempty"`
+	Usuarios []Usuario `gorm:"foreignkey:TipoUsuarioID"`
 }

@@ -1,9 +1,13 @@
 package models
 
+import "gorm.io/gorm"
+
 type Cidade struct {
-	CidadeID int `json:"cidade_id,omitempty"`
+	gorm.Model
 	Status   string `json:"status,omitempty"`
 	Nome string`json:"nome,omitempty"`
+	InstituicaoID int
 	EstadoID int `json:"estado_id,omitempty"`
+	Usuarios []Usuario `gorm:"foreignkey:CidadeID"`
 
 }

@@ -1,13 +1,19 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type InscricaoEmAtividade struct {
-	AtividadeID int `json:"atividade_id,omitempty"`
-	EventoID    int `json:"evento_id,omitempty"`
-	Status string `json:"status,omitempty"`
-	Data time.Time `json:"data,omitempty"`
-	Hora time.Time `json:"hora,omitempty"`
-	ControlePresencaID int `json:"contole_presenca_id,omitempty"`
+	gorm.Model
+    AtividadeID        int       `json:"atividade_id,omitempty"`
+	EventoID           int       `json:"evento_id,omitempty"`
+	Status             string    `json:"status,omitempty"`
+	Data               time.Time `json:"data,omitempty"`
+	Hora               time.Time `json:"hora,omitempty"`
+	ControlePresenca   ControlePresenca  `gorm:"foreignKey:ControlePresencaID,omitempty"`
+	ControlePresencaID int       `json:"controle_presenca_id,omitempty"`
 	
 }

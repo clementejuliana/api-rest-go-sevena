@@ -1,8 +1,11 @@
 package models
 
+import "gorm.io/gorm"
+
 type Estado struct {
+	gorm.Model
 	Status   string `json:"status,omitempty"`
-	EstadoID int`json:"estado_id,omitempty"`
 	Nome string `json:"nome,omitempty"`
+	Cidades []Cidade `gorm:"foreignkey:EstadoID"`
 
 }

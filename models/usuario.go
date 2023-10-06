@@ -21,7 +21,9 @@ type Usuario struct {
 	FotoPerfil string `json:"foto_perfil,omitempty"`
 	TipoUsuarioID int `json:"tipo_usuario_id,omitempty"`
 	InstituicaoID int `json:"instituicao_id,omitempty"`
-	CidadeID int `json:"cidade_id,omitempty"`
+	CidadeID int `json:"cidadeid,omitempty"`
+	Instituicoes []Instituicao `gorm:"many2many:instituicao_usuarios;"`
+	
 
 }
 // criar uma lista de usuario que é referente ao tipo

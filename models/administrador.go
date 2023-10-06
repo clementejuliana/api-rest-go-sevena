@@ -1,7 +1,11 @@
 package models
 
+import "gorm.io/gorm"
+
 
 type Administrador struct {
-    UsuarioID int `json:"usuario_id"`
+    gorm.Model
+    Usuario   Usuario `gorm:"foreignKey:UsuarioID"`
+    UsuarioID int     `json:"usuario_id,omitempty"`
     
 }
