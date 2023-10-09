@@ -24,7 +24,7 @@ func Saudacao(c *gin.Context) {
 }
 
 // criar esse novo aluno
-func CriarNovoAluno(c *gin.Context) {
+func CriarNovoUsuario(c *gin.Context) {
 	var usuario models.Usuario
 	if err := c.ShouldBindJSON(&usuario); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

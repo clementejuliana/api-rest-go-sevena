@@ -16,6 +16,62 @@ func ExibirEstado(c *gin.Context) {
 	c.JSON(200, estados)
 }
 
+
+//exibir uma mensagem quando está passando um valoe não valido
+func SaudacaoEstado(c *gin.Context) {
+	nome := c.Params.ByName("nome")
+	c.JSON(200, gin.H{
+		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
+	})
+}
+
+// criar esse novo aluno
+func CriarNovoEstado(c *gin.Context) {
+	var estado models.Estado
+	if err := c.ShouldBindJSON(&estado); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	databasee.DB.Create(&estado)
+	c.JSON(http.StatusOK, estado)
+}
+
+func BuscarEstadoPorID(c *gin.Context) {
+	var estado models.Estado
+	id := c.Params.ByName("id")
+	databasee.DB.First(&estado, id)
+
+	if estado.ID == 00 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not found": "Estado Não encontrando"})
+		return
+	}
+	c.JSON(http.StatusOK, estado)
+}
+
+func DeleteEstado(c *gin.Context) {
+	var estado models.Estado
+	id := c.Params.ByName("id")
+	databasee.DB.Delete(&estado, id)
+	c.JSON(http.StatusOK, gin.H{"data": "Estado deletado com sucesso"})
+}
+
+func EditarEstado(c *gin.Context)  {
+	var estado models.Estado
+	id := c.Params.ByName("id")
+	databasee.DB.First(&estado, id)
+
+	if err := c.ShouldBindJSON(&estado); err !=nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+    databasee.DB.Model(&estado).UpdateColumns(estado)
+	c.JSON(http.StatusOK, estado)
+	
+}
+
 func GetEstados(c *gin.Context) {
 	// Retorna todos os estados
 	var estados []models.Estado
