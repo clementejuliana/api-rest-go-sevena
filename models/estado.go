@@ -6,6 +6,4 @@ type Estado struct {
 	gorm.Model
 	Status   string `json:"status,omitempty"`
 	Nome string `json:"nome,omitempty"`
-	Cidades []Cidade `gorm:"foreignkey:EstadoID"`
-
 }
