@@ -6,31 +6,40 @@ import (
 )
 
 // função que lida com as requisões
-func HandleRequests()  {
-r := gin.Default()
-r.GET("/usuarios", controllers.ExibirUsuario)
-r.GET("/:nome", controllers.Saudacao)
-r.POST("/usuarios", controllers.CriarNovoUsuario)
-r.GET("/usuarios/:id", controllers.BuscarUsuarioPorID)
-r.DELETE("/usuarios/:id", controllers.DeleteUsuario)
-r.PATCH("/usuarios/:id", controllers.EditarUsuario)
-r.GET("usuarios/cpf/:cpf", controllers.BuscarUsuarioPorCPF)
+func HandleRequests() {
+	r := gin.Default()
+	// Grupo de rotas de usuário
+	user := r.Group("/usuario")
+	{
+		user.GET("/", controllers.ExibirUsuario)
+		user.GET("/nome/:nome", controllers.Saudacao)
+		user.POST("/", controllers.CriarNovoUsuario)
+		user.GET("/:id", controllers.BuscarUsuarioPorID)
+		user.DELETE("/:id", controllers.DeleteUsuario)
+		user.PATCH("/:id", controllers.EditarUsuario)
+		user.GET("usuario/cpf/:cpf", controllers.BuscarUsuarioPorCPF)
+	}
 
-r.GET("/estados", controllers.ExibirEstado)
-r.GET("/:nome", controllers.SaudacaoEstado)
-r.POST("/estados", controllers.CriarNovoEstado)
-r.GET("/estados", controllers.BuscarEstadoPorID)
-r.DELETE("/estados/:id", controllers.DeleteEstado)
-r.PATCH("/estados/:id", controllers.EditarEstado)
+	// Grupo de rotas de estado
+	estado := r.Group("/estado")
+	{
+		estado.GET("/", controllers.ExibirEstado)
+		estado.POST("/", controllers.CriarNovoEstado)
+		estado.GET("/:id", controllers.BuscarEstadoPorID)
+		estado.DELETE("/:id", controllers.DeleteEstado)
+		estado.PATCH("/:id", controllers.EditarEstado)
+	}
 
+	// Grupo de rotas de instituição
+	instituicao := r.Group("/instituicao")
+	{
+		instituicao.GET("/", controllers.ExibirInstuicao)
+		instituicao.POST("/", controllers.CriarNovaInstituicao)
+		instituicao.GET("/:id", controllers.BuscarInstuicaoPorID)
+		instituicao.DELETE("/:id", controllers.DeleteInstituicao)
+		instituicao.PATCH("/:id", controllers.EditarInstituicao)
+	}
 
-r.GET("/instituicao", controllers.ExibirInstuicao)
-r.GET("/:nome", controllers.SaudacaoInstituicao)
-r.POST("/instituicao", controllers.CriarNovaInstituicao)
-r.GET("/instituicao", controllers.BuscarInstuicaoPorID)
-r.DELETE("/instituicao/:id", controllers.DeleteInstituicao)
-r.PATCH("/instituicao/:id", controllers.EditarInstituicao)
-
-r.Run()
+	r.Run()
 
 }

@@ -23,6 +23,8 @@ func ConexaoBD () {
 		log.Panic("erro ao conectar com o banco de dados") 
 	}
 	DB.AutoMigrate(&models.Usuario{})
+	DB.AutoMigrate(&models.Estado{})
+	DB.AutoMigrate(&models.Instituicao{})
 	
 }
 

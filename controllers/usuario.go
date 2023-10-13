@@ -83,3 +83,10 @@ func BuscarUsuarioPorCPF(c *gin.Context)  {
 	c.JSON(http.StatusOK, usuario)
 
 }
+func ExibirEstado(c *gin.Context) {
+	var estados []models.Estado
+	databasee.DB.Find(&estados)
+	c.JSON(200, estados)
+}
+
+

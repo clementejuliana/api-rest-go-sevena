@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ExibirEstado(c *gin.Context) {
+func ExibirEstados(c *gin.Context) {
 	var estados []models.Estado
 	databasee.DB.Find(&estados)
 	c.JSON(200, estados)
