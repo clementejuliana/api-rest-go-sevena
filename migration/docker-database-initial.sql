@@ -66,12 +66,7 @@ CREATE TABLE instituicao
     FOREIGN KEY (cidade_id) REFERENCES cidade (id)
 );
 
-INSERT INTO instituicao
-    (status, nome, sigla, cnpj, endereco, telefone, email, cidade_id)
-VALUES
-    ('ativo', 'Universidade de São Paulo', 'USP', '12345678901234', 'Rua do Matão, 1010, São Paulo, SP', '(11) 99999-9999', 'usp@usp.br', 1),
-    ('ativo', 'Universidade Federal do Rio de Janeiro', 'UFRJ', '98765432109876', 'Av. Carlos Chagas Filho, 373, Rio de Janeiro, RJ', '(21) 88888-8888', 'ufrj@ufrj.br', 4),
-    ('ativo', 'Universidade Federal de Minas Gerais', 'UFMG', '76543210987654', 'Av. Antônio Carlos, 6627, Belo Horizonte, MG', '(31) 77777-7777', 'ufmg@ufmg.br', 6);
+
 
 CREATE TABLE usuario
 (
@@ -95,22 +90,22 @@ CREATE TABLE usuario
     FOREIGN KEY (cidade_id) REFERENCES cidade (id)
 );
 
-INSERT INTO usuario
-    (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
-VALUES
-    ('ativo', 'João da Silva', '123.456.789-00', '000.456.789-00', 'masculino', '1990-01-01', 'joao.da.silva@email.com', '123456789', 'ensino superior', 'engenheiro', NULL, 1, 1, 1);
-INSERT INTO usuario
-    (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
-VALUES
-    ('ativo', 'Juliana Clemente', '145.456.789-00', '456.456.789-00', 'feminino', '1995-10-01', 'ju@email.com', '12345', 'ensino superior', 'desenvolvedora', NULL, 1, 1, 1);
-INSERT INTO usuario
-    (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
-VALUES
-    ('ativo', 'Thiago Gouvea', '178.456.789-00', '093.456.789-00', 'masculino', '1998-12-01', 'thiago@email.com', '1234', 'ensino superior', 'dev', NULL, 1, 1, 1);
-INSERT INTO usuario
-    (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
-VALUES
-    ('ativo', 'Jaqueline Menezes', '143.456.789-00', '094.456.789-00', 'feminino', '1990-08-02', 'jaque@email.com', '1234', 'ensino superior', 'gestora', NULL, 1, 1, 1);
+-- INSERT INTO usuario
+--     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
+-- VALUES
+--     ('ativo', 'João da Silva', '123.456.789-00', '000.456.789-00', 'masculino', '1990-01-01', 'joao.da.silva@email.com', '123456789', 'ensino superior', 'engenheiro', NULL, 1, 1, 1);
+-- INSERT INTO usuario
+--     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
+-- VALUES
+--     ('ativo', 'Juliana Clemente', '145.456.789-00', '456.456.789-00', 'feminino', '1995-10-01', 'ju@email.com', '12345', 'ensino superior', 'desenvolvedora', NULL, 1, 1, 1);
+-- INSERT INTO usuario
+--     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
+-- VALUES
+--     ('ativo', 'Thiago Gouvea', '178.456.789-00', '093.456.789-00', 'masculino', '1998-12-01', 'thiago@email.com', '1234', 'ensino superior', 'dev', NULL, 1, 1, 1);
+-- INSERT INTO usuario
+--     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
+-- VALUES
+--     ('ativo', 'Jaqueline Menezes', '143.456.789-00', '094.456.789-00', 'feminino', '1990-08-02', 'jaque@email.com', '1234', 'ensino superior', 'gestora', NULL, 1, 1, 1);
 
 CREATE TABLE local
 (

@@ -40,6 +40,44 @@ func HandleRequests() {
 		instituicao.PATCH("/:id", controllers.EditarInstituicao)
 	}
 
+	tipoUsuario := r.Group("/tipoUsuario")
+	{
+		tipoUsuario.GET("/", controllers.ExibirTipoUsuario)
+		tipoUsuario.POST("/", controllers.CriarTipoUsuario)
+		tipoUsuario.GET("/:id", controllers.BuscarTipoUsuarioPorID)
+		tipoUsuario.DELETE("/:id", controllers.DeleteTipoUsuario)
+		tipoUsuario.PATCH("/:id", controllers.EditarTipoUsuario)
+	}
+
+	locals := r.Group("/local")
+	{
+		locals.GET("/", controllers.ExibirLocal)
+		locals.POST("/",controllers.CriarNovoLocal)
+		locals.GET("/:id",controllers.BuscarLocalPorID)
+		locals.DELETE("/:id",controllers.DeleteLocal)
+		locals.PATCH("/:id",controllers.EditarLocal)
+	}
+
+	cidades := r.Group("/cidade")
+	{
+		cidades.GET("/",controllers.ExibirCidade)
+		cidades.POST("/",controllers.CriarCidade)
+		cidades.GET("/:id",controllers.BuscarCidadePorID)
+		cidades.DELETE("/:id",controllers.DeleteCidade)
+		cidades.PATCH("/:id",controllers.EditarCidade)
+	}
+
+	eventos := r.Group("/evento")
+	{
+		eventos.GET("/",controllers.ExibirEventos)
+		eventos.POST("/",controllers.CriarNovoEvento)
+		eventos.GET("/:id",controllers.BuscarEventoPorID)
+		eventos.DELETE("/:id",controllers.DeleteEvento)
+		eventos.PATCH("/:id",controllers.EditarEvento)
+	}
+
+
+
 	r.Run()
 
 }

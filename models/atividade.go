@@ -10,7 +10,7 @@ type Atividade struct {
 	gorm.Model
     AtividadeID        int       `json:"atividade_id,omitempty"`
     Status             string    `json:"status,omitempty"`
-    TipoAtividade      TipoAtividade `gorm:"foreignKey:TipoAtividadeID,omitempty"`
+    TipoAtividade      TipoAtividade 
     TipoAtividadeID    int       `json:"tipo_atividade_id,omitempty"`
     Titulo             string    `json:"titulo,omitempty"`
     Resumo             string    `json:"resumo,omitempty"`
@@ -24,6 +24,6 @@ type Atividade struct {
     Duracao            float64   `json:"duracao,omitempty"`
     CargaHoraria       int       `json:"carga_horaria,omitempty"`
     QuantidadeInscritos int      `json:"quantidade_inscritos,omitempty"`
-    Local              Local     `gorm:"foreignKey:LocalID,omitempty"`
+    Local              Local     
     LocalID            int       `json:"local_id,omitempty"`
 }

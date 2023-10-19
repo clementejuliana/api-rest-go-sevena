@@ -72,6 +72,12 @@ func EditarEstado(c *gin.Context)  {
 	
 }
 
+func ExibirEstado(c *gin.Context) {
+	var estados []models.Estado
+	databasee.DB.Find(&estados)
+	c.JSON(200, estados)
+}
+
 func GetEstados(c *gin.Context) {
 	// Retorna todos os estados
 	var estados []models.Estado

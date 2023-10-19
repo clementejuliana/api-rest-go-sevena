@@ -9,9 +9,9 @@ import (
 )
 
 func ExibirUsuario(c *gin.Context) {
-	var usuarios []models.Usuario
-	databasee.DB.Find(&usuarios)
-	c.JSON(200, usuarios)
+	var usuario []models.Usuario
+	databasee.DB.Find(&usuario)
+	c.JSON(200, usuario)
 
 }
 
@@ -83,10 +83,3 @@ func BuscarUsuarioPorCPF(c *gin.Context)  {
 	c.JSON(http.StatusOK, usuario)
 
 }
-func ExibirEstado(c *gin.Context) {
-	var estados []models.Estado
-	databasee.DB.Find(&estados)
-	c.JSON(200, estados)
-}
-
-

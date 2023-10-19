@@ -13,9 +13,9 @@ type InscricaoEmEvento struct {
 	Status              string    `json:"status,omitempty"`
 	Data                time.Time `json:"data,omitempty"`
 	Hora                time.Time `json:"hora,omitempty"`
-	Evento              Evento     `gorm:"foreignKey:EventoID,omitempty"`
+	Evento              Evento    
 	EventoID            int       `json:"evento_id,omitempty"`
-	Usuario             Usuario   `gorm:"foreignKey:UsuarioID,omitempty"`
+	Usuario             Usuario   
 	UsuarioID           int       `json:"usuario_id,omitempty"`
 
 }

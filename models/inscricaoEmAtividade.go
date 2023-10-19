@@ -13,7 +13,7 @@ type InscricaoEmAtividade struct {
 	Status             string    `json:"status,omitempty"`
 	Data               time.Time `json:"data,omitempty"`
 	Hora               time.Time `json:"hora,omitempty"`
-	ControlePresenca   ControlePresenca  `gorm:"foreignKey:ControlePresencaID,omitempty"`
+	ControlePresenca   ControlePresenca  
 	ControlePresencaID int       `json:"controle_presenca_id,omitempty"`
 	
 }
