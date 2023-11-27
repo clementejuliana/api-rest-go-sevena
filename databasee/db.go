@@ -26,19 +26,19 @@ func ConexaoBD () {
 	DB.AutoMigrate(&models.Estado{})
 	DB.AutoMigrate(&models.Instituicao{})
 	DB.AutoMigrate(&models.TipoUsuario{})//, &models.Atividade{}//)
-	//DB.AutoMigrate(&models.Administrador{})
-	//DB.AutoMigrate(&models.Atividade{})
+	DB.AutoMigrate(&models.Administrador{})
+	DB.AutoMigrate(&models.Atividade{})
 
-	//DB.AutoMigrate(&models.Auth{})
+	DB.AutoMigrate(&models.Auth{})
 	DB.AutoMigrate(&models.Cidade{})
-	//DB.AutoMigrate(&models.ControlePresenca{})
+	DB.AutoMigrate(&models.ControlePresenca{})
 	DB.AutoMigrate(&models.Evento{})
-	//DB.AutoMigrate(&models.InscricaoEmAtividade{})
-	//DB.AutoMigrate(&models.InscricaoEmEvento{})
+	DB.AutoMigrate(&models.InscricaoEmAtividade{})
+	DB.AutoMigrate(&models.InscricaoEmEvento{})
 	DB.AutoMigrate(&models.Local{})
-	//DB.AutoMigrate(&models.Notificacao{})
-	//DB.AutoMigrate(&models.RecuperacaoSenha{})
-	//DB.AutoMigrate(&models.TipoAtividade{})
+	DB.AutoMigrate(&models.Notificacao{})
+	DB.AutoMigrate(&models.RecuperacaoSenha{})
+	DB.AutoMigrate(&models.TipoAtividade{})
 	
 	
 }
