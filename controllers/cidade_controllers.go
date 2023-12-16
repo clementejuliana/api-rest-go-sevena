@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
@@ -23,10 +25,14 @@ func SaudacaoCidade(c *gin.Context) {
 	})
 }
 
-// criar esse novo aluno
 func CriarCidade(c *gin.Context) {
 	var cidade models.Cidade
 	if err := c.ShouldBindJSON(&cidade); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	if err := cidade.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
@@ -55,31 +61,41 @@ func DeleteCidade(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "Cidade deletada com sucesso"})
 }
 
-func EditarCidade(c *gin.Context)  {
+func EditarCidade(c *gin.Context) {
 	var cidade models.Cidade
 	id := c.Params.ByName("id")
 	databasee.DB.First(&cidade, id)
 
-	if err := c.ShouldBindJSON(&cidade); err !=nil {
+	if err := c.ShouldBindJSON(&cidade); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
-    databasee.DB.Model(&cidade).UpdateColumns(cidade)
+	databasee.DB.Model(&cidade).UpdateColumns(cidade)
 	c.JSON(http.StatusOK, cidade)
-	
+
 }
 
-// func BuscarUsuarioPorCPF(c *gin.Context)  {
-// 	var usuario models.Usuario
-// 	cpf := c.Param("cpf")
-// 	databasee.DB.Where(&models.Usuario{CPF: cpf}).First(&usuario)
-	
-// 	if usuario.ID == 00 {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"Not found": "Usuario Não encontrando"})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, usuario)
+func CarregarCidades(c *gin.Context) {
+	// Ler o arquivo JSON
+	dados, err := ioutil.ReadFile("data/estados-cidades2.json")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-// }
+	// Decodificar o arquivo JSON
+	cidades := []models.Cidade{}
+	if err := json.Unmarshal(dados, &cidades); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Salvar as cidades no banco de dados
+	for _, cidade := range cidades {
+		databasee.DB.Create(&cidade)
+	}
+
+	// Retornar as cidades
+	c.JSON(http.StatusOK, cidades)
+}

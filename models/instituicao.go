@@ -17,17 +17,3 @@ type Instituicao struct {
 	Cidades  []Cidade `gorm:"foreignkey:InstituicaoID"`
 }
 
-// func UpdateInstituicaoStatus(c *gin.Context) {
-// 	var instituicao Instituicao
-// 	id := c.Params.ByName("id")
-// 	newStatus := c.Params.ByName("status")
-
-// 	if err := databasee.Where("id = ?", id).First(&instituicao).Error; err == nil {
-// 		instituicao.Status = newStatus
-// 		databasee.Save(&instituicao)
-// 		c.JSON(200, instituicao)
-// 	} else {
-// 		c.AbortWithStatus(404)
-// 		fmt.Println(err)
-// 	}
-// }

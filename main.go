@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	databasee.ConexaoBD()
 	// Carregue as variáveis de ambiente do arquivo .env
 	err := godotenv.Load()
 	if err != nil {
@@ -27,7 +28,7 @@ func main() {
 	// Configurar o modo Gin
 	gin.SetMode(ginMode)
 
-	databasee.ConexaoBD()
+	//databasee.ConexaoBD()
 	routes.HandleRequests()
 
 	// Configurar o modo "release" do Gin

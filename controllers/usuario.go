@@ -31,6 +31,14 @@ func CriarNovoUsuario(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+	if err := usuario.Preparar(); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	
+
+	
 	databasee.DB.Create(&usuario)
 	c.JSON(http.StatusOK, usuario)
 }

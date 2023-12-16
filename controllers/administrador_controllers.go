@@ -14,13 +14,13 @@ func ExibirAdministrador(c *gin.Context) {
 	c.JSON(200, administrador)
 }
 
-//exibir uma mensagem quando está passando um valor não valido
-func SaudacaoAdministrador(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
+// //exibir uma mensagem quando está passando um valor não valido
+// func SaudacaoAdministrador(c *gin.Context) {
+// 	nome := c.Params.ByName("nome")
+// 	c.JSON(200, gin.H{
+// 		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
+// 	})
+// }
 
 // criar esse novo administrador
 func CriarNovoAdministrador(c *gin.Context) {

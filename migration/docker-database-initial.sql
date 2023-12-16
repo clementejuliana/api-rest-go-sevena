@@ -4,58 +4,40 @@
 
 CREATE TABLE tipo_usuario
 (
-    id serial PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL
+    id serial PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    tipo_usuario VARCHAR(255) UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO tipo_usuario
-    (nome)
-VALUES
-    ('Professor'),
-    ('Aluno'),
-    ('Funcionário');
 
 CREATE TABLE estado
 (
-    id serial PRIMARY key,
-    status VARCHAR(5) not NULL,
-    nome VARCHAR(255) NOT NULL
+    id serial PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    nome VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
-
-INSERT INTO estado
-    (status, nome)
-VALUES
-    ('ativo', 'São Paulo'),
-    ('ativo', 'Rio de Janeiro'),
-    ('ativo', 'Minas Gerais');
 
 
 CREATE TABLE cidade
 (
-    id serial PRIMARY key,
-    status VARCHAR(5) not NULL,
+    id serial PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     nome VARCHAR(255) NOT NULL,
     estado_id int,
-    FOREIGN KEY (estado_id) REFERENCES estado (id)
+    FOREIGN KEY (estado_id) REFERENCES estado (id),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
---Inserindo dados na tabela cidade
-INSERT INTO cidade
-    (status, nome, estado_id)
-VALUES
-    ('ativo', 'São Paulo', 1),
-    ('ativo', 'Campinas', 1),
-    ('ativo', 'Ribeirão Preto', 1),
-    ('ativo', 'Rio de Janeiro', 2),
-    ('ativo', 'Niterói', 2),
-    ('ativo', 'Belo Horizonte', 3);
 
 
 CREATE TABLE instituicao
 (
-    id serial PRIMARY KEY,
-    status VARCHAR(5) NOT NULL,
+    id serial PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     nome VARCHAR(255) NOT NULL,
     sigla VARCHAR(255) NOT NULL,
     cnpj VARCHAR(14) NOT NULL,
@@ -63,15 +45,18 @@ CREATE TABLE instituicao
     telefone VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     cidade_id int NOT NULL,
-    FOREIGN KEY (cidade_id) REFERENCES cidade (id)
+    FOREIGN KEY (cidade_id) REFERENCES cidade (id),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
 
 
 
 CREATE TABLE usuario
 (
-    id serial PRIMARY KEY,
-    status VARCHAR(5) NOT NULL,
+    id serial PRIMARY KEY NOT NULL ,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     nome VARCHAR(255) NOT NULL,
     cpf VARCHAR(15) NOT NULL,
     rg VARCHAR(15) NOT NULL,
@@ -87,58 +72,42 @@ CREATE TABLE usuario
     cidade_id INT NOT NULL,
     FOREIGN KEY (tipo_usuario_id) REFERENCES tipo_usuario (id),
     FOREIGN KEY (instituicao_id) REFERENCES instituicao (id),
-    FOREIGN KEY (cidade_id) REFERENCES cidade (id)
+    FOREIGN KEY (cidade_id) REFERENCES cidade (id),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
--- INSERT INTO usuario
---     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
--- VALUES
---     ('ativo', 'João da Silva', '123.456.789-00', '000.456.789-00', 'masculino', '1990-01-01', 'joao.da.silva@email.com', '123456789', 'ensino superior', 'engenheiro', NULL, 1, 1, 1);
--- INSERT INTO usuario
---     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
--- VALUES
---     ('ativo', 'Juliana Clemente', '145.456.789-00', '456.456.789-00', 'feminino', '1995-10-01', 'ju@email.com', '12345', 'ensino superior', 'desenvolvedora', NULL, 1, 1, 1);
--- INSERT INTO usuario
---     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
--- VALUES
---     ('ativo', 'Thiago Gouvea', '178.456.789-00', '093.456.789-00', 'masculino', '1998-12-01', 'thiago@email.com', '1234', 'ensino superior', 'dev', NULL, 1, 1, 1);
--- INSERT INTO usuario
---     (status, nome, cpf, rg, genero, data_nascimento, email, telefone, escolaridade, profissao, foto_perfil, tipo_usuario_id, instituicao_id, cidade_id)
--- VALUES
---     ('ativo', 'Jaqueline Menezes', '143.456.789-00', '094.456.789-00', 'feminino', '1990-08-02', 'jaque@email.com', '1234', 'ensino superior', 'gestora', NULL, 1, 1, 1);
 
 CREATE TABLE local
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(50) NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     sala VARCHAR(50) NOT NULL,
-    setor VARCHAR(50),
-    evento_id int not null,
-    atividades_id int not NULL,
+    setor VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE evento
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     nome VARCHAR(350) NOT NULL,
     descricao VARCHAR(500) NOT NULL,
-    data_inicio TIMESTAMP NOT NULL,
-    data_final TIMESTAMP NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_final DATE NOT NULL,
     local_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(local_id)REFERENCES local(id)
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
 
 CREATE TABLE inscricaoEmEvento
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(255),
-    data TIMESTAMP NOT NULL,
-    hora TIMESTAMP NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    data DATE NOT NULL,
+    hora TIME NOT NULL,
     evento_id INTEGER NOT NULL,
     usuario_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -149,8 +118,8 @@ CREATE TABLE inscricaoEmEvento
 
 CREATE TABLE tipoAtividade
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(255),
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     tipo_da_atividade VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -158,15 +127,15 @@ CREATE TABLE tipoAtividade
 
 CREATE TABLE atividade
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     tipo_atividade_id INTEGER NOT NULL,
     titulo VARCHAR(255) NOT NULL,
     resumo VARCHAR(255),
-    data TIMESTAMP NOT NULL,
-    hora_inicio TIMESTAMP NOT NULL,
-    hora_termino TIMESTAMP NOT NULL,
-    valor_inscricao FLOAT4 NOT NULL,
+    data DATE NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_termino TIME NOT NULL,
+    valor_inscricao FLOAT4,
     observacao VARCHAR(255),
     ministrante VARCHAR(255) NOT NULL,
     quantidade_vagas INTEGER NOT NULL,
@@ -177,15 +146,16 @@ CREATE TABLE atividade
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo_atividade_id) REFERENCES tipoAtividade(id),
-    FOREIGN KEY (local_id) REFERENCES local(id)
+    FOREIGN KEY (local_id) REFERENCES local (id)
 );
+
 
 CREATE TABLE controlePresenca
 (
-    id SERIAL PRIMARY KEY,
-    status VARCHAR(255) NOT NULL,
-    hora_entrada TIMESTAMP NOT NULL,
-    hora_saida TIMESTAMP NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    hora_entrada TIME NOT NULL,
+    hora_saida TIME NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 
@@ -193,12 +163,12 @@ CREATE TABLE controlePresenca
 
 CREATE TABLE inscricaoEmAtividade
 (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY NOT NULL,
     atividade_id INTEGER NOT NULL,
     evento_id INTEGER NOT NULL,
-    status VARCHAR(255),
-    data TIMESTAMP NOT NULL,
-    hora TIMESTAMP NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    data TIME NOT NULL,
+    hora TIME NOT NULL,
     controle_presenca_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -209,7 +179,8 @@ CREATE TABLE inscricaoEmAtividade
 
 CREATE TABLE administrador
 (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
     usuario_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -218,7 +189,7 @@ CREATE TABLE administrador
 
 CREATE TABLE auth
 (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY NOT NULL,
     usuario_id INTEGER NOT NULL,
     token VARCHAR(255) NOT NULL,
     data_expiracao TIMESTAMP NOT NULL,
@@ -230,17 +201,26 @@ CREATE TABLE auth
 
 CREATE TABLE login
 (
+    id SERIAL PRIMARY KEY NOT NULL,
+    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    usuarioEmail VARCHAR(255) NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    ExpirationData DATE NOT NULL,
     email VARCHAR(255) NOT NULL,
-    senha VARCHAR(255) NOT NULL
+    senha VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuario (id)
 
 );
 
 
 CREATE TABLE recuperacaoSenha
 (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY NOT NULL,
     usuario_id INTEGER NOT NULL,
     token VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     data_expiracao TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -250,7 +230,7 @@ CREATE TABLE recuperacaoSenha
 
 CREATE TABLE notificacao
 (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY NOT NULL,
     usuario_id INTEGER NOT NULL,
     notificacao_id INTEGER NOT NULL,
     conteudo VARCHAR(255) NOT NULL,

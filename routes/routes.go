@@ -8,6 +8,7 @@ import (
 // função que lida com as requisões
 func HandleRequests() {
 	r := gin.Default()
+	r.GET("/usuario", controllers.EditarUsuario)
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
 	{
@@ -28,6 +29,7 @@ func HandleRequests() {
 		estado.GET("/:id", controllers.BuscarEstadoPorID)
 		estado.DELETE("/:id", controllers.DeleteEstado)
 		estado.PATCH("/:id", controllers.EditarEstado)
+		estado.GET("/carrega-estado", controllers.CarregarEstados)
 	}
 
 	// Grupo de rotas de instituição
@@ -65,6 +67,7 @@ func HandleRequests() {
 		cidades.GET("/:id", controllers.BuscarCidadePorID)
 		cidades.DELETE("/:id", controllers.DeleteCidade)
 		cidades.PATCH("/:id", controllers.EditarCidade)
+		cidades.POST("/carrega-cidades", controllers.CarregarCidades)
 	}
 
 	eventos := r.Group("/evento")
@@ -87,14 +90,14 @@ func HandleRequests() {
 
 	atividades := r.Group("/atividade")
 	{
-		atividades.GET("/", controllers.EditarAtividade)
+		atividades.GET("/", controllers.ExibirAtividade)
 		atividades.POST("/", controllers.CriarNovaAtividade)
 		atividades.GET("/:id", controllers.BuscarAtividadePorID)
 		atividades.DELETE("/:id", controllers.DeleteAtividade)
 		atividades.PATCH("/:id", controllers.EditarAtividade)
 	}
 
-controlePresencas := r.Group("/controlePresencas")
+controlePresencas := r.Group("/controlePresenca")
 {
 	controlePresencas.GET("/",controllers.ExibirControlePresenca)
 	controlePresencas.POST("/",controllers.CriarNovoControlePresenca)
