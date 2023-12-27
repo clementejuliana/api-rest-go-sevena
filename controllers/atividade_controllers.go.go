@@ -31,6 +31,12 @@ func CriarNovaAtividade(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+
+	if err := atividade.Preparar(); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
 	databasee.DB.Create(&atividade)
 	c.JSON(http.StatusOK, atividade)
 }

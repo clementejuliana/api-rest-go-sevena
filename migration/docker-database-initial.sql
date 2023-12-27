@@ -80,9 +80,10 @@ CREATE TABLE usuario
 CREATE TABLE local
 (
     id SERIAL PRIMARY KEY NOT NULL,
-    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    status VARCHAR(255) CHECK (status IN ('Disponivel', 'inativo')),
     sala VARCHAR(50) NOT NULL,
     setor VARCHAR(50) NOT NULL,
+    DataHoraFim DATETIME,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -95,6 +96,8 @@ CREATE TABLE evento
     descricao VARCHAR(500) NOT NULL,
     data_inicio DATE NOT NULL,
     data_final DATE NOT NULL,
+    DataHoraInicio DATETIME,
+    DataHoraFim DATETIME,
     local_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -120,7 +123,7 @@ CREATE TABLE tipoAtividade
 (
     id SERIAL PRIMARY KEY NOT NULL,
     status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
-    tipo_da_atividade VARCHAR(255) NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -166,7 +169,7 @@ CREATE TABLE inscricaoEmAtividade
     id SERIAL PRIMARY KEY NOT NULL,
     atividade_id INTEGER NOT NULL,
     evento_id INTEGER NOT NULL,
-    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    status VARCHAR(255) CHECK (status IN ('pendente', 'confirmada', 'cancelada')),
     data TIME NOT NULL,
     hora TIME NOT NULL,
     controle_presenca_id INTEGER NOT NULL,

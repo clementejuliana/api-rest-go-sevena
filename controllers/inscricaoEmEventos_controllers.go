@@ -30,6 +30,11 @@ func CriarNovaInscricaoEmEventos(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+	if err := inscricaoEmEventos.Preparar(); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
 	databasee.DB.Create(&inscricaoEmEventos)
 	c.JSON(http.StatusOK, inscricaoEmEventos)
 }

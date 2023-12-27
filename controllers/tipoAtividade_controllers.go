@@ -15,25 +15,15 @@ func ExibirTipoAtividade(c *gin.Context) {
 	c.JSON(200, tipoAtividade)
 
 }
-
-//exibir uma mensagem quando está passando um valoe não valido
-// 
-
-
-
-
-
-
-
-
-
-
-
-
 // criar esse novo aluno
 func CriarNovoTipoAtividade(c *gin.Context) {
 	var tipoAtividade models.TipoAtividade
 	if err := c.ShouldBindJSON(&tipoAtividade); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	if err := tipoAtividade.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return

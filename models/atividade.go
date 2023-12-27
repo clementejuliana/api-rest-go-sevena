@@ -1,29 +1,101 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type Atividade struct {
-	gorm.Model
-    AtividadeID        int       `json:"atividade_id,omitempty"`
-    Status             string    `json:"status,omitempty"`
-    TipoAtividade      TipoAtividade 
-    TipoAtividadeID    int       `json:"tipo_atividade_id,omitempty"`
-    Titulo             string    `json:"titulo,omitempty"`
-    Resumo             string    `json:"resumo,omitempty"`
-    Data               time.Time `json:"data,omitempty"`
-    HoraInicio         time.Time `json:"hora_inicio,omitempty"`
-    HoraTermino        time.Time `json:"hora_termino,omitempty"`
-    ValorInscricao     float64   `json:"valor_inscricao"`
-    Observacao         string    `json:"observacao"`
-    Ministrante        string    `json:"ministrante,omitempty"`
-    QuantidadeVagas    int       `json:"quantidade_vagas,omitempty"`
-    Duracao            float64   `json:"duracao,omitempty"`
-    CargaHoraria       int       `json:"carga_horaria,omitempty"`
-    QuantidadeInscritos int      `json:"quantidade_inscritos,omitempty"`
-    Local              Local     
-    LocalID            int       `json:"local_id,omitempty"`
+	gorm.Model `json:"atividade_id,omitempty"`
+	// AtividadeID        int       `json:"atividade_id,omitempty"`
+	Status              string `json:"status,omitempty"`
+	TipoAtividade       TipoAtividade
+	TipoAtividadeID     int       `json:"tipo_atividade_id,omitempty"`
+	Titulo              string    `json:"titulo,omitempty"`
+	Resumo              string    `json:"resumo,omitempty"`
+	Data                time.Time `json:"data,omitempty"`
+	HoraInicio          time.Time `json:"hora_inicio,omitempty"`
+	HoraTermino         time.Time `json:"hora_termino,omitempty"`
+	ValorInscricao      float64   `json:"valor_inscricao"`
+	Observacao          string    `json:"observacao"`
+	Ministrante         string    `json:"ministrante,omitempty"`
+	QuantidadeVagas     int       `json:"quantidade_vagas,omitempty"`
+	Duracao             float64   `json:"duracao,omitempty"`
+	CargaHoraria        int       `json:"carga_horaria,omitempty"`
+	QuantidadeInscritos int       `json:"quantidade_inscritos,omitempty"`
+	Local               Local
+	LocalID             int `json:"local_id,omitempty"`
+}
+
+func (atividade *Atividade) Preparar() error {
+	// Chama a função ValidarU
+	err := atividade.ValidarAtividade()
+	// Verifica se houve erros
+	if err != nil {
+		return err
+	}
+	// Retorna nil se não houver erros
+	return nil
+}
+
+type Intervalo struct {
+    DataInicio time.Time
+    DataFim    time.Time
+}
+
+
+
+func (a *Atividade) ValidarAtividade() error {
+
+	if a.Status != "ativo" && a.Status != "inativo" {
+		return errors.New("status é obrigatório")
+	}
+	if a.TipoAtividadeID == 0 {
+		return errors.New("tipo_atividade_id é obrigatório")
+	}
+	if a.Titulo == "" {
+		return errors.New("titulo é obrigatório")
+	}
+	if a.Resumo == "" {
+		return errors.New("resumo é obrigatório")
+	}
+	if a.Data.IsZero() {
+		return errors.New("data é obrigatória")
+	}
+	if a.HoraInicio.IsZero() {
+		return errors.New("hora_inicio é obrigatória")
+	}
+	if a.HoraTermino.IsZero() {
+		return errors.New("hora_termino é obrigatória")
+	}
+	if a.ValorInscricao == 0 {
+		return errors.New("valor_inscricao é obrigatório")
+	}
+	if a.Ministrante == "" {
+		return errors.New("ministrante é obrigatório")
+	}
+	if a.QuantidadeVagas == 0 {
+		return errors.New("quantidade_vagas é obrigatório")
+	}
+	if a.Duracao == 0 {
+		return errors.New("duracao é obrigatório")
+	}
+	if a.CargaHoraria == 0 {
+		return errors.New("carga_horaria é obrigatório")
+	}
+	if a.LocalID == 0 {
+		return errors.New("local_id é obrigatório")
+	}
+	// adicione mais validações conforme necessário
+	return nil
+}
+
+// GetIntervalo retorna o intervalo de tempo da atividade
+func (a *Atividade) GetIntervalo() (Intervalo, error) {
+	return Intervalo{
+		DataInicio: a.Data,
+		DataFim:    a.Data.Add(time.Duration(a.Duracao) * time.Hour),
+	}, nil
 }

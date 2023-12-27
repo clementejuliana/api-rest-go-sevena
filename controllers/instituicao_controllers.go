@@ -31,6 +31,11 @@ func CriarNovaInstituicao(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+	if err := instituicao.Preparar(); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
 	databasee.DB.Create(&instituicao)
 	c.JSON(http.StatusOK, instituicao)
 }

@@ -29,6 +29,11 @@ func CriarNovoControlePresenca(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+	if err := controlePresenca.Preparar(); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
 	databasee.DB.Create(&controlePresenca)
 	c.JSON(http.StatusOK, controlePresenca)
 }

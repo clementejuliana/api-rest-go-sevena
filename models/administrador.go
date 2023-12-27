@@ -13,6 +13,8 @@ type Administrador struct {
 	Status             string    `json:"status,omitempty"`
     
 }
+
+
 func ValidateAdministrador(administrador Administrador) error {
 	err := validator.New().Struct(administrador)
 	if err != nil {

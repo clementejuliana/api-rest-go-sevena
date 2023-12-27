@@ -31,6 +31,11 @@ func CriarNovoEvento(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+	if err := evento.Preparar(databasee.DB); err != nil{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
 	databasee.DB.Create(&evento)
 	c.JSON(http.StatusOK, evento)
 }
