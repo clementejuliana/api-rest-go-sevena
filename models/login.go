@@ -2,17 +2,12 @@ package models
 
 import (
 	"errors"
-	
-	"time"
+	"regexp"
 )
 
 type Login struct {
-    ID        int    `json:"id"`
-    UsuarioEmail string `json:"usuario_email"`
-    Status    string `json:"status"`
-    ExpirationData time.Time `json:"expiration_data"`
-    Email string `json:"email"`
-    Senha string `json:"senha"`
+	Email        string `json:"email"`
+	Senha        string `json:"senha"`
 }
 
 func (login *Login) Preparar() error {
@@ -27,24 +22,30 @@ func (login *Login) Preparar() error {
 }
 
 func (login *Login) ValidateLogin() error {
-    // Valida se os campos obrigatórios estão preenchidos
-    if login.UsuarioEmail == "" {
-        return errors.New("Usuário e-mail é obrigatório")
-    }
+	// Valida se os campos obrigatórios estão preenchidos
+	if login.Email == "" {
+		return errors.New("Usuário e-mail é obrigatório")
+	}
 
-    if login.Senha == "" {
-        return errors.New("Senha é obrigatória")
-    }
+	if login.Senha == "" {
+		return errors.New("Senha é obrigatória")
+	}
 
-    // Valida se o e-mail é válido
-    //if !strings.Contains(validEmails, login.Email) {
-        //return errors.New("E-mail inválido")
-   // }
+	// Valida se o e-mail é válido
+	if !isEmailValid(login.Email) {
+		return errors.New("E-mail inválido")
+	}
 
-    // Valida se a senha é válida
-    if len(login.Senha) < 6 {
-        return errors.New("Senha deve ter pelo menos 6 caracteres")
-    }
+	// Valida se a senha é válida
+	if len(login.Senha) < 6 {
+		return errors.New("Senha deve ter pelo menos 6 caracteres")
+	}
 
-    return nil
+	return nil
+}
+
+func isEmailValid(email string) bool {
+	regex := `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
+	match := regexp.MustCompile(regex).MatchString
+	return match(email)
 }

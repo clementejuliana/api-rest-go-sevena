@@ -18,6 +18,7 @@ type Usuario struct {
 	Genero         string        `json:"genero"`
 	DataNascimento time.Time     `json:"data_nascimento"`
 	Email          string        `json:"email,omitempty"`
+	Senha          string        `json:"senha,omitempty"`
 	Telefone       string        `json:"telefone,omitempty"`
 	Escolaridade   string        `json:"escolaridade"`
 	Profissao      string        `json:"profissao"`
@@ -44,7 +45,6 @@ func (usuario Usuario) ValidarUsuario() error {
 	rgRegexp := regexp.MustCompile("[0-9]{2}.?[0-9]{3}.?[0-9]{3}-?[0-9]{1}")
 	nomere := regexp.MustCompile("^[a-zA-Záàâãéêíóôõúçñ ]+$")
 	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	
 
 	// Valida o status
 	if usuario.Status != "ativo" && usuario.Status != "inativo" {
@@ -83,6 +83,10 @@ func (usuario Usuario) ValidarUsuario() error {
 
 	}
 
+	if len(usuario.Senha) > 20 {
+        return errors.New("senha deve ter no máximo 20 caracteres")
+    }
+
 	// Valida o telefone
 	if len(usuario.Telefone) < 8 {
 		return errors.New("telefone deve ter pelo menos 8 caracteres")
@@ -120,7 +124,6 @@ func (usuario Usuario) ValidarUsuario() error {
 
 	return nil
 }
-
 
 func (usuario *Usuario) formatar() {
 	usuario.Nome = strings.Trim(usuario.Nome, "")

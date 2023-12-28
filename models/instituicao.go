@@ -33,6 +33,8 @@ func (instituicao *Instituicao) Preparar() error {
 
 
 func (instituicao *Instituicao) ValidarInstituicao() error {
+	cnpj := regexp.MustCompile("^[0-9]{2}.[0-9]{3}.[0-9]{3}/[0-9]{4}-[0-9]{2}$")
+
     if instituicao.Status == "" {
         return errors.New("campo 'Status' é obrigatório")
     }
@@ -41,13 +43,10 @@ func (instituicao *Instituicao) ValidarInstituicao() error {
         return errors.New("campo 'Nome' é obrigatório")
     }
 
-    if instituicao.CNPJ == "" {
-        return errors.New("campo 'CNPJ' é obrigatório")
-    }
 
-    if !regexp.MustCompile(`^[0-9]{18}$`).MatchString(instituicao.CNPJ) {
-        return errors.New("campo 'CNPJ' deve ter 14 dígitos")
-    }
+	if !cnpj.MatchString(instituicao.CNPJ) {
+		return errors.New("CNPJ inválido")
+	}
 
     if instituicao.Endereco == "" {
         return errors.New("campo 'Endereco' é obrigatório")

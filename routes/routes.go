@@ -8,12 +8,11 @@ import (
 // função que lida com as requisões
 func HandleRequests() {
 	r := gin.Default()
-	r.GET("/usuario", controllers.EditarUsuario)
+	r.POST("/login", controllers.Login)
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
 	{
 		user.GET("/", controllers.ExibirUsuario)
-		user.GET("/nome/:nome", controllers.Saudacao)
 		user.POST("/", controllers.CriarNovoUsuario)
 		user.GET("/:id", controllers.BuscarUsuarioPorID)
 		user.DELETE("/:id", controllers.DeleteUsuario)

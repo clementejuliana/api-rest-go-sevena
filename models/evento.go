@@ -9,7 +9,6 @@ import (
 
 type Evento struct {
 	gorm.Model
-	//  EventoID  int       `json:"evento_id,omitempty"`
 	Status     string    `json:"status,omitempty"`
 	Nome       string    `json:"nome,omitempty"`
 	Descricao  string    `json:"descricao,omitempty"`
@@ -27,12 +26,17 @@ func (evento *Evento) Preparar(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
-//Verifica conflito de horário passando a instância do banco de dados
-err = evento.VerificarConflitosHorario(db)
-if err != nil {
-	return err
-}
-	
+	//Verifica conflito de horário passando a instância do banco de dados
+	err = evento.VerificarConflitosHorario(db)
+	if err != nil {
+		return err
+	}
+
+	_, err = evento.HorariosDisponiveis(db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -87,24 +91,33 @@ func (e *Evento) VerificarConflitosHorario(db *gorm.DB) error {
 	return nil
 }
 
-func (evento *Evento) HorariosDisponiveis(db *gorm.DB) (_[]Local, data_inicio error) {
-	// Substitua com sua própria lógica para obter os horários disponíveis para o local e data do evento
-	// Considere consultar eventos existentes para o local e calcular os horários disponíveis
-
-	// Exemplo de consulta de eventos para o local e data do evento
+func (evento *Evento) HorariosDisponiveis(db *gorm.DB) ([]Evento, error) {
 	var eventos []Evento
-	err := db.Where("LocalID = ? AND (DataInicio >= ? AND DataFinal <= ?)", evento.LocalID, evento.DataInicio, evento.DataFinal).
+	err := db.Where("local_id = ? AND (data_inicio >= ? AND  data_final<= ?)", evento.LocalID, evento.DataInicio, evento.DataFinal).
 		Find(&eventos).Error
 	if err != nil {
 		return nil, err
 	}
 
-	// Implemente a lógica para calcular os horários disponíveis com base nos eventos existentes
+	// Crie uma lista de intervalos de tempo ocupados pelos eventos existentes
+	var intervalosDeTempoOcupados []time.Time
+	for _, evento := range eventos {
+		intervalosDeTempoOcupados = append(intervalosDeTempoOcupados, evento.DataInicio, evento.DataFinal)
+	}
+	// Crie uma lista de horários disponíveis
+	var horariosDisponiveis []Evento
+	for horaInicio := time.Now(); horaInicio.Before(evento.DataFinal); horaInicio = horaInicio.Add(time.Hour) {
+		horariosDisponiveis = append(horariosDisponiveis, Evento{HoraInicio: horaInicio, HoraFim: horaInicio.Add(time.Hour)})
+	}
+	// Exclua os horários ocupados da lista de horários disponíveis
+	for _, intervaloDeTempoOcupado := range intervalosDeTempoOcupados {
+		for i, horarioDisponivel := range horariosDisponiveis {
+			if intervaloDeTempoOcupado.After(horarioDisponivel.HoraInicio) && intervaloDeTempoOcupado.Before(horarioDisponivel.HoraFim) {
+				horariosDisponiveis = append(horariosDisponiveis[:i], horariosDisponiveis[i+1:]...)
+			}
+		}
+	}
 
-	// Retorne os horários disponíveis
-	return []HorarioDisponivel{
-		{HoraInicio: time.Now(), HoraFim: time.Now().Add(time.Hour)},
-		{HoraInicio: time.Now().Add(2 * time.Hour), HoraFim: time.Now().Add(3 * time.Hour)},
-		// Adicione mais horários disponíveis conforme necessário
-	}, nil
+	// Retorne os horários disponíveis restantes
+	return horariosDisponiveis, nil
 }

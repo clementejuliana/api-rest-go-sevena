@@ -204,16 +204,10 @@ CREATE TABLE auth
 
 CREATE TABLE login
 (
-    id SERIAL PRIMARY KEY NOT NULL,
-    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
-    usuarioEmail VARCHAR(255) NOT NULL,
-    usuario_id INTEGER NOT NULL,
-    ExpirationData DATE NOT NULL,
     email VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuario (id)
 
 );
 

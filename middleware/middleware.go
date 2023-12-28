@@ -6,7 +6,7 @@ import (
 )
 
 
-func Auth() gin.HandlerFunc {
+func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const Bearer_schema = "Bearer "
 		header := c.GetHeader("Authorization")

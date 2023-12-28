@@ -1,7 +1,9 @@
 package models
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 
 	"time"
 
@@ -88,4 +90,31 @@ func (i *InscricaoEmAtividade) VerificarConflitoHorario(db *gorm.DB) error {
     }
 
     return nil
+}
+
+func RelatorioInscritosPorAtividade(db *gorm.DB) ([]byte, error) {
+    // Consulta para obter os inscritos por atividade
+    var inscritos []struct {
+        AtividadeID int
+        UsuarioID int
+        Nome string
+        Email string
+    }
+    result := db.Model(&InscricaoEmAtividade{}).
+        Select("AtividadeID, UsuarioID, Nome, Email").
+        Scan(&inscritos)
+
+    if result.Error != nil {
+        return nil, result.Error
+    }
+
+    // Gera o relatório
+    var buffer bytes.Buffer
+    for _, inscrito := range inscritos {
+		buffer.WriteString("Atividade: " + fmt.Sprintf("%d", inscrito.AtividadeID) + "\n")
+        buffer.WriteString("Usuário: " + inscrito.Nome + "\n")
+        buffer.WriteString("E-mail: " + inscrito.Email + "\n")
+    }
+
+    return buffer.Bytes(), nil
 }

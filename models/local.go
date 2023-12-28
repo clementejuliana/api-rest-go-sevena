@@ -48,19 +48,3 @@ func (local *Local) ValidateLocal() error {
 
 	return nil
 }
-
-// // Função para obter horários disponíveis em um determinado dia
-// func (local *Local) HorariosDisponiveis(data time.Time) ([]time.Time, error) {
-// 	// Lógica para obter os horários disponíveis na data especificada
-// 	// Pode envolver consulta ao banco de dados, por exemplo
-
-// 	// Exemplo: retornando uma lista fixa de horários para fins de demonstração
-// 	horarios := []time.Time{
-// 		data.Add(1 * time.Hour),
-// 		data.Add(2 * time.Hour),
-// 		data.Add(3 * time.Hour),
-// 		// Adicione mais horários conforme necessário
-// 	}
-
-// 	return horarios, nil
-// }
