@@ -8,20 +8,15 @@ import (
 )
 
 func ExibirControlePresenca(c *gin.Context) {
-	var controlePresenca []models.ControlePresenca
-	databasee.DB.Find(&controlePresenca)
-	c.JSON(200, controlePresenca)
+    var controlePresenca []models.ControlePresenca
+    if err := databasee.DB.Find(&controlePresenca).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, err)
+        return
+    }
+    c.JSON(http.StatusOK, controlePresenca)
 }
 
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoControlePresenca(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
 
-// criar esse novo aluno
 func CriarNovoControlePresenca(c *gin.Context) {
 	var controlePresenca models.ControlePresenca
 	if err := c.ShouldBindJSON(&controlePresenca); err != nil {
@@ -38,18 +33,6 @@ func CriarNovoControlePresenca(c *gin.Context) {
 	c.JSON(http.StatusOK, controlePresenca)
 }
 
-func BuscarControlePresencaPorID(c *gin.Context) {
-	var controlePresenca models.ControlePresenca
-	id := c.Params.ByName("id")
-	databasee.DB.First(&controlePresenca, id)
-
-	if controlePresenca.ID == 00 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"Not found": "Controle de Presença Não encontrando"})
-		return
-	}
-	c.JSON(http.StatusOK, controlePresenca)
-}
 
 func DeleteControlePresenca(c *gin.Context) {
 	var controlePresenca models.ControlePresenca
@@ -71,4 +54,21 @@ func EditarControlePresenca(c *gin.Context)  {
     databasee.DB.Model(&controlePresenca).UpdateColumns(controlePresenca)
 	c.JSON(http.StatusOK, controlePresenca)
 	
+}
+
+func FiltrarControlePresenca(c *gin.Context) {
+    var filtros models.ControlePresenca
+    if err := c.BindJSON(&filtros); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Dados de filtro inválidos"})
+        return
+    }
+
+    var controlePresenca []models.ControlePresenca
+    if err := databasee.DB.Where(&filtros).Find(&controlePresenca).Error; err != nil {
+        // Trate o erro, por exemplo, retornando 500 Internal Server Error
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar registros de presença"})
+        return
+    }
+
+    c.JSON(http.StatusOK, controlePresenca)
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+
 	"errors"
 	"fmt"
 
@@ -19,6 +20,9 @@ type InscricaoEmAtividade struct {
 	Hora               time.Time         `json:"hora,omitempty"`
 	ControlePresencaID uint              `json:"controle_presenca_id,omitempty" gorm:"foreignKey:ControlePresenca"`
 	ControlePresenca   *ControlePresenca `json:"controle_presenca,omitempty"`
+	UsuarioID          int               `json:"usuario_id,omitempty"`
+	Usuario            *Usuario          `json:"usuario,omitempty"`
+	Atividade          *Atividade        `json:"atividade,omitempty"`
 }
 
 func (inscricaoA *InscricaoEmAtividade) Preparar(db *gorm.DB) error {
@@ -31,7 +35,7 @@ func (inscricaoA *InscricaoEmAtividade) Preparar(db *gorm.DB) error {
 	//Verifica conflito de horário passando a instância do banco de dados
 	err = inscricaoA.VerificarConflitoHorario(db)
 	if err != nil {
-	    return err
+		return err
 	}
 
 	// Retorna nil se não houver erros
@@ -74,47 +78,156 @@ func (i *InscricaoEmAtividade) ValidarInscricaoAtividade() error {
 }
 
 func (i *InscricaoEmAtividade) VerificarConflitoHorario(db *gorm.DB) error {
-    // Consulta para verificar conflito de horário
-    var count int64
-    result := db.Model(&InscricaoEmAtividade{}).
-        Where("Evento_ID = ? AND Data = ? AND ((Hora >= ? AND Hora < ?) OR (Hora <= ? AND ? < Hora))",
-            i.EventoID, i.Data, i.Hora, i.Hora.Add(time.Hour), i.Hora, i.Hora.Add(time.Hour)).
-        Count(&count)
+	// Consulta para verificar conflito de horário
+	var count int64
+	result := db.Model(&InscricaoEmAtividade{}).
+		Where("Evento_ID = ? AND Data = ? AND ((Hora >= ? AND Hora < ?) OR (Hora <= ? AND ? < Hora))",
+			i.EventoID, i.Data, i.Hora, i.Hora.Add(time.Hour), i.Hora, i.Hora.Add(time.Hour)).
+		Count(&count)
 
-    if result.Error != nil {
-        return result.Error
-    }
+	if result.Error != nil {
+		return result.Error
+	}
 
-    if count > 0 {
-        return errors.New("conflito de horário com outra inscrição")
-    }
+	if count > 0 {
+		return errors.New("conflito de horário com outra inscrição")
+	}
 
-    return nil
+	return nil
+}
+
+func (a *Atividade) GetInscritos(db *gorm.DB) ([]Usuario, error) {
+	var usuarios []Usuario
+
+	// Busca todas as inscrições para a atividade atual
+	inscricoes := []InscricaoEmAtividade{}
+	if err := db.Where("atividade_id = ?", a.ID).Find(&inscricoes).Error; err != nil {
+		return nil, err
+	}
+
+	// Para cada inscrição, busca o usuário correspondente
+	for _, inscricao := range inscricoes {
+		usuario := Usuario{}
+		if err := db.Where("id = ?", inscricao.UsuarioID).First(&usuario).Error; err != nil {
+			return nil, err
+		}
+		usuarios = append(usuarios, usuario)
+	}
+
+	return usuarios, nil
+}
+
+func GerarRelatorioInscritosAtividades(db *gorm.DB) ([]byte, error) {
+	// Consulta as inscrições em atividades
+	inscricoes := []InscricaoEmAtividade{}
+	if err := db.Find(&inscricoes).Error; err != nil {
+		return nil, err
+	}
+
+	// Cria um buffer para o relatório
+	buffer := bytes.NewBuffer([]byte{})
+
+	// Escreve o cabeçalho do relatório
+	buffer.WriteString("Atividade | Nome | Email\n")
+
+	// Itera sobre as inscrições
+	for _, inscricao := range inscricoes {
+		// Obtém o nome e o email do usuário
+		nome := inscricao.Usuario.Nome
+		email := inscricao.Usuario.Email
+
+		// Obtém o nome da atividade
+		titulo := inscricao.Atividade.Titulo
+
+		// Escreve a linha do relatório
+		buffer.WriteString(fmt.Sprintf("%s | %s | %s\n", titulo, nome, email))
+	}
+
+	// Retorna o relatório
+	return buffer.Bytes(), nil
+}
+
+func RelatorioInscritosPorAtividade0000(db *gorm.DB) ([]byte, error) {
+	// Consulta para obter os inscritos por atividade
+	var inscritos []struct {
+		AtividadeID   int
+		UsuarioID     int
+		NomeUsuario   string
+		Email         string
+		NomeAtividade string
+	}
+	result := db.Model(&InscricaoEmAtividade{}).
+		Select("inscricao_em_atividades.atividade_id, usuario.id as usuario_id, usuario.nome as nome_usuario, usuario.email, atividade.nome as nome_atividade").
+		Joins("INNER JOIN usuario ON usuario.id = inscricao_em_atividades.usuario_id").
+		Joins("INNER JOIN atividade ON atividade.id = inscricao_em_atividades.atividade_id").
+		Scan(&inscritos)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Gera o relatório
+	var buffer bytes.Buffer
+	for _, inscrito := range inscritos {
+		buffer.WriteString("Atividade: " + inscrito.NomeAtividade + "\n")
+		buffer.WriteString("Usuário: " + inscrito.NomeUsuario + "\n")
+		buffer.WriteString("E-mail: " + inscrito.Email + "\n")
+		buffer.WriteString("\n")
+	}
+
+	return buffer.Bytes(), nil
 }
 
 func RelatorioInscritosPorAtividade(db *gorm.DB) ([]byte, error) {
-    // Consulta para obter os inscritos por atividade
-    var inscritos []struct {
-        AtividadeID int
-        UsuarioID int
-        Nome string
-        Email string
-    }
-    result := db.Model(&InscricaoEmAtividade{}).
-        Select("AtividadeID, UsuarioID, Nome, Email").
-        Scan(&inscritos)
+	var inscritos []struct {
+		AtividadeID int
+		UsuarioID   int
+		Nome        string
+		Email       string
+	}
 
-    if result.Error != nil {
-        return nil, result.Error
-    }
+	// Utilize o método Preload para pré-carregar a relação com o usuário (assumindo que a relação está definida no modelo).
+	result := db.Model(&InscricaoEmAtividade{}).
+		Preload("usuario").
+		Select("inscricao_em_atividades.atividade_id, usuario.usuario_id, usuario.nome, usuario.email").
+		Scan(&inscritos)
 
-    // Gera o relatório
-    var buffer bytes.Buffer
-    for _, inscrito := range inscritos {
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	var buffer bytes.Buffer
+	for _, inscrito := range inscritos {
 		buffer.WriteString("Atividade: " + fmt.Sprintf("%d", inscrito.AtividadeID) + "\n")
-        buffer.WriteString("Usuário: " + inscrito.Nome + "\n")
-        buffer.WriteString("E-mail: " + inscrito.Email + "\n")
-    }
+		buffer.WriteString("Usuário: " + inscrito.Nome + "\n")
+		buffer.WriteString("E-mail: " + inscrito.Email + "\n")
+		buffer.WriteString("-------------------------------\n")
+	}
 
-    return buffer.Bytes(), nil
+	return buffer.Bytes(), nil
+}
+
+func RelatorioInscritosPorAtividade1(db *gorm.DB) ([]byte, error) {
+	var inscritos []struct {
+		AtividadeID int
+		UsuarioID   int
+		Nome        string
+		Email       string
+	}
+	result := db.Model(&InscricaoEmAtividade{}).
+		Select("inscricao_em_atividades.atividade_id, Usuario.usuario_id, Usuario.nome, Usuario.email").
+		Scan(&inscritos)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	var buffer bytes.Buffer
+	for _, inscrito := range inscritos {
+		buffer.WriteString("Atividade: " + fmt.Sprintf("%d", inscrito.AtividadeID) + "\n")
+		buffer.WriteString("Usuário: " + inscrito.Nome + "\n")
+		buffer.WriteString("E-mail: " + inscrito.Email + "\n")
+	}
+
+	return buffer.Bytes(), nil
 }

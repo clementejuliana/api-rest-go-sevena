@@ -9,6 +9,11 @@ import (
 func HandleRequests() {
 	r := gin.Default()
 	r.POST("/login", controllers.Login)
+	//r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosPorAtividade)
+	//r.GET("/gerar_relatorio", controllers.RelatorioInscritosPorAtividade)
+	r.GET("/gerar_relatorio", controllers.GetInscritosNoEvento)
+	
+
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
 	{
@@ -96,41 +101,40 @@ func HandleRequests() {
 		atividades.PATCH("/:id", controllers.EditarAtividade)
 	}
 
-controlePresencas := r.Group("/controlePresenca")
-{
-	controlePresencas.GET("/",controllers.ExibirControlePresenca)
-	controlePresencas.POST("/",controllers.CriarNovoControlePresenca)
-	controlePresencas.GET("/:id",controllers.BuscarControlePresencaPorID)
-	controlePresencas.DELETE("/:id",controllers.DeleteControlePresenca)
-	controlePresencas.PATCH("/:id",controllers.EditarControlePresenca)
-}
+	controlePresencas := r.Group("/controlePresenca")
+	{
+		controlePresencas.GET("/", controllers.ExibirControlePresenca)
+		controlePresencas.POST("/", controllers.CriarNovoControlePresenca)
+		//controlePresencas.GET("/:id", controllers.BuscarControlePresencaPorID)
+		controlePresencas.DELETE("/:id", controllers.DeleteControlePresenca)
+		controlePresencas.PATCH("/:id", controllers.EditarControlePresenca)
+	}
 
-inscricaoEmEventos := r.Group("/inscricaoEmEventos")
-{
-	inscricaoEmEventos.GET("/",controllers.ExibirInscricaoEmEventos)
-	inscricaoEmEventos.POST("/",controllers.CriarNovaInscricaoEmEventos)
-	inscricaoEmEventos.GET("/:id",controllers.BuscarInscricaoEmEventosPorID)
-	inscricaoEmEventos.DELETE("/:id",controllers.DeleteInscricaoEmEventos)
-	inscricaoEmEventos.PATCH("/:id",controllers.EditarInscricaoEmEventos)
-}
+	inscricaoEmEventos := r.Group("/inscricaoEmEventos")
+	{
+		inscricaoEmEventos.GET("/", controllers.ExibirInscricaoEmEventos)
+		inscricaoEmEventos.POST("/", controllers.CriarNovaInscricaoEmEventos)
+		inscricaoEmEventos.GET("/:id", controllers.BuscarInscricaoEmEventosPorID)
+		inscricaoEmEventos.DELETE("/:id", controllers.DeleteInscricaoEmEventos)
+		inscricaoEmEventos.PATCH("/:id", controllers.EditarInscricaoEmEventos)
+	}
 
-inscricaoEmAtividades := r.Group("/inscricaoEmAtividades")
-{
-	inscricaoEmAtividades.GET("/",controllers.ExibirInscricaoEmAtividade)
-	inscricaoEmAtividades.POST("/",controllers.CriarNovaInscricaoEmAtividade)
-	inscricaoEmAtividades.GET("/:id",controllers.BuscarInscricaoEmAtividadePorID)
-	inscricaoEmAtividades.DELETE("/:id",controllers.DeleteInscricaoEmAtividade)
-	inscricaoEmAtividades.PATCH("/:id",controllers.EditarInscricaoEmAtividade)
-}
-tipoAtividades := r.Group("/tipoAtividades")
-{
-	tipoAtividades.GET("/",controllers.ExibirTipoAtividade)
-	tipoAtividades.POST("/",controllers.CriarNovoTipoAtividade)
-	tipoAtividades.GET("/:id",controllers.BuscarTipoAtividadePorID)
-	tipoAtividades.DELETE("/:id",controllers.DeleteTipoAtividade)
-	tipoAtividades.PATCH("/:id",controllers.EditarTipoAtividade)
-}
-
+	inscricaoEmAtividades := r.Group("/inscricaoEmAtividades")
+	{
+		inscricaoEmAtividades.GET("/", controllers.ExibirInscricaoEmAtividade)
+		inscricaoEmAtividades.POST("/", controllers.CriarNovaInscricaoEmAtividade)
+		inscricaoEmAtividades.GET("/:id", controllers.BuscarInscricaoEmAtividadePorID)
+		inscricaoEmAtividades.DELETE("/:id", controllers.DeleteInscricaoEmAtividade)
+		inscricaoEmAtividades.PATCH("/:id", controllers.EditarInscricaoEmAtividade)
+	}
+	tipoAtividades := r.Group("/tipoAtividades")
+	{
+		tipoAtividades.GET("/", controllers.ExibirTipoAtividade)
+		tipoAtividades.POST("/", controllers.CriarNovoTipoAtividade)
+		tipoAtividades.GET("/:id", controllers.BuscarTipoAtividadePorID)
+		tipoAtividades.DELETE("/:id", controllers.DeleteTipoAtividade)
+		tipoAtividades.PATCH("/:id", controllers.EditarTipoAtividade)
+	}
 
 	r.Run()
 

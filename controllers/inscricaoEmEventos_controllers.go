@@ -30,7 +30,7 @@ func CriarNovaInscricaoEmEventos(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
-	if err := inscricaoEmEventos.Preparar(); err != nil{
+	if err := inscricaoEmEventos.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
@@ -59,17 +59,38 @@ func DeleteInscricaoEmEventos(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "Inscrição em eventos deletada com sucesso"})
 }
 
-func EditarInscricaoEmEventos(c *gin.Context)  {
+func EditarInscricaoEmEventos(c *gin.Context) {
 	var inscricaoEmEventos models.InscricaoEmEvento
 	id := c.Params.ByName("id")
 	databasee.DB.First(&inscricaoEmEventos, id)
 
-	if err := c.ShouldBindJSON(&inscricaoEmEventos); err !=nil {
+	if err := c.ShouldBindJSON(&inscricaoEmEventos); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
-    databasee.DB.Model(&inscricaoEmEventos).UpdateColumns(inscricaoEmEventos)
+	databasee.DB.Model(&inscricaoEmEventos).UpdateColumns(inscricaoEmEventos)
 	c.JSON(http.StatusOK, inscricaoEmEventos)
-	
+
+}
+func GetInscritosNoEvento(c *gin.Context) {
+    // Obtém o ID do evento da URL (por exemplo, /eventos/1/inscritos)
+    eventoID := c.Param("eventoID")
+
+    // Busca o evento no banco de dados
+    evento := models.Evento{}
+    if err := databasee.DB.Where("id = ?", eventoID).First(&evento).Error; err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Busca os inscritos no evento
+    inscritos, err := evento.GetInscritos(databasee.DB)
+    if err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Retorna os inscritos para o cliente
+    c.JSON(200, inscritos)
 }

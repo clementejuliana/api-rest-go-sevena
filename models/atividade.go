@@ -8,25 +8,25 @@ import (
 )
 
 type Atividade struct {
-	gorm.Model `json:"atividade_id,omitempty"`
-	// AtividadeID        int       `json:"atividade_id,omitempty"`
-	Status              string `json:"status,omitempty"`
-	TipoAtividade       TipoAtividade
-	TipoAtividadeID     int       `json:"tipo_atividade_id,omitempty"`
-	Titulo              string    `json:"titulo,omitempty"`
-	Resumo              string    `json:"resumo,omitempty"`
-	Data                time.Time `json:"data,omitempty"`
-	HoraInicio          time.Time `json:"hora_inicio,omitempty"`
-	HoraTermino         time.Time `json:"hora_termino,omitempty"`
-	ValorInscricao      float64   `json:"valor_inscricao"`
-	Observacao          string    `json:"observacao"`
-	Ministrante         string    `json:"ministrante,omitempty"`
-	QuantidadeVagas     int       `json:"quantidade_vagas,omitempty"`
-	Duracao             float64   `json:"duracao,omitempty"`
-	CargaHoraria        int       `json:"carga_horaria,omitempty"`
-	QuantidadeInscritos int       `json:"quantidade_inscritos,omitempty"`
-	Local               Local
-	LocalID             int `json:"local_id,omitempty"`
+	gorm.Model                        `json:"atividade_id,omitempty"`
+	Status              string        `json:"status,omitempty"`
+	TipoAtividade       TipoAtividade `json:"tipo_atividade,omitempty"`
+	TipoAtividadeID     int           `json:"tipo_atividade_id,omitempty"`
+	Titulo              string        `json:"titulo,omitempty"`
+	Resumo              string        `json:"resumo,omitempty"`
+	Data                time.Time     `json:"data,omitempty"`
+	HoraInicio          time.Time     `json:"hora_inicio,omitempty"`
+	HoraTermino         time.Time     `json:"hora_termino,omitempty"`
+	ValorInscricao      float64       `json:"valor_inscricao"`
+	Observacao          string        `json:"observacao"`
+	Ministrante         string        `json:"ministrante,omitempty"`
+	QuantidadeVagas     int           `json:"quantidade_vagas,omitempty"`
+	Duracao             float64       `json:"duracao,omitempty"`
+	CargaHoraria        int           `json:"carga_horaria,omitempty"`
+	QuantidadeInscritos int           `json:"quantidade_inscritos,omitempty"`
+	Local               Local         `json:"local,omitempty"`
+	LocalID             int           `json:"local_id,omitempty"`
+	
 }
 
 func (atividade *Atividade) Preparar() error {
@@ -41,13 +41,12 @@ func (atividade *Atividade) Preparar() error {
 }
 
 type Intervalo struct {
-    DataInicio time.Time
-    DataFim    time.Time
+	DataInicio time.Time
+	DataFim    time.Time
 }
 
-
-
 func (a *Atividade) ValidarAtividade() error {
+	now := time.Now()
 
 	if a.Status != "ativo" && a.Status != "inativo" {
 		return errors.New("status é obrigatório")
@@ -61,14 +60,14 @@ func (a *Atividade) ValidarAtividade() error {
 	if a.Resumo == "" {
 		return errors.New("resumo é obrigatório")
 	}
-	if a.Data.IsZero() {
-		return errors.New("data é obrigatória")
+	if a.Data.IsZero() || a.Data.Before(now) {
+		return errors.New("data é obrigatória e deve estar no futuro")
 	}
-	if a.HoraInicio.IsZero() {
-		return errors.New("hora_inicio é obrigatória")
+	if a.HoraInicio.IsZero() || a.HoraInicio.Before(now) {
+		return errors.New("hora_inicio é obrigatória e deve estar no futuro")
 	}
-	if a.HoraTermino.IsZero() {
-		return errors.New("hora_termino é obrigatória")
+	if a.HoraTermino.IsZero() || a.HoraTermino.Before(a.HoraInicio) {
+		return errors.New("hora_termino é obrigatória e deve ser após hora_inicio")
 	}
 	if a.ValorInscricao == 0 {
 		return errors.New("valor_inscricao é obrigatório")
@@ -88,14 +87,15 @@ func (a *Atividade) ValidarAtividade() error {
 	if a.LocalID == 0 {
 		return errors.New("local_id é obrigatório")
 	}
-	// adicione mais validações conforme necessário
 	return nil
 }
 
-// GetIntervalo retorna o intervalo de tempo da atividade
 func (a *Atividade) GetIntervalo() (Intervalo, error) {
+	if a.HoraInicio.After(a.HoraTermino) {
+		return Intervalo{}, errors.New("hora_inicio deve ser antes de hora_termino")
+	}
 	return Intervalo{
-		DataInicio: a.Data,
-		DataFim:    a.Data.Add(time.Duration(a.Duracao) * time.Hour),
+		DataInicio: a.HoraInicio,
+		DataFim:    a.HoraTermino,
 	}, nil
 }

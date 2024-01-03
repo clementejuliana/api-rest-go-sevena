@@ -2,11 +2,9 @@ package controllers
 
 import (
 	"net/http"
-
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/gin-gonic/gin"
-	//"gorm.io/gorm"
 )
 
 func ExibirInscricaoEmAtividade(c *gin.Context) {
@@ -76,4 +74,26 @@ func EditarInscricaoEmAtividade(c *gin.Context) {
 	databasee.DB.Model(&inscricaoEmAtividade).UpdateColumns(inscricaoEmAtividade)
 	c.JSON(http.StatusOK, inscricaoEmAtividade)
 
+}
+
+func RelatorioInscritosPorAtividade1(c *gin.Context) {
+	var inscricoes []models.InscricaoEmAtividade
+	databasee.DB.Preload("Usuario").Preload("Atividade").Find(&inscricoes)
+
+	relatorio := make(map[int][]models.Usuario)
+	for _, inscricao := range inscricoes {
+		relatorio[inscricao.AtividadeID] = append(relatorio[inscricao.AtividadeID], *inscricao.Usuario)
+	}
+
+	c.JSON(http.StatusOK, relatorio)
+}
+
+func RelatorioInscritosPorAtividade(c *gin.Context) {
+	relatorio, err := models.RelatorioInscritosPorAtividade1(databasee.DB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Data(http.StatusOK, "application/json", relatorio)
 }
