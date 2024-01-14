@@ -9,9 +9,17 @@ import (
 func HandleRequests() {
 	r := gin.Default()
 	r.POST("/login", controllers.Login)
-	//r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosPorAtividade)
-	//r.GET("/gerar_relatorio", controllers.RelatorioInscritosPorAtividade)
-	r.GET("/gerar_relatorio", controllers.GetInscritosNoEvento)
+	r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosEmAtividade)
+	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
+
+
+	//r.GET("/gerar_relatorio", controllers.GerarRelatorioInscricoes(ger))
+	//r.GET("/eventos/:evento_id/relatorio", controllers.GerarRelatorioInscritosEvento)
+	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
+	r.GET("/evento/usuarios-inscritos", controllers.ObterUsuariosInscritosNoEvento)
+	r.GET("/cidades", controllers.ListarCidades)
+
+
 	
 
 	// Grupo de rotas de usuário

@@ -131,3 +131,12 @@ func (usuario *Usuario) formatar() {
 	usuario.Email = strings.Trim(usuario.Email, "")
 	usuario.RG = strings.Trim(usuario.RG, "")
 }
+
+func (u *Usuario) GetUsuariosInscritos(db *gorm.DB, eventoID uint) ([]Usuario, error) {
+	var usuarios []Usuario
+	result := db.Table("inscricao_em_eventos").Select("usuarios.*").Joins("left join usuarios on usuarios.id = inscricao_em_eventos.usuario_id").Where("inscricao_em_eventos.evento_id = ?", eventoID).Find(&usuarios)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return usuarios, nil
+}

@@ -36,6 +36,10 @@ func (atividade *Atividade) Preparar() error {
 	if err != nil {
 		return err
 	}
+
+	
+
+	
 	// Retorna nil se não houver erros
 	return nil
 }
@@ -78,6 +82,9 @@ func (a *Atividade) ValidarAtividade() error {
 	if a.QuantidadeVagas == 0 {
 		return errors.New("quantidade_vagas é obrigatório")
 	}
+	if a.QuantidadeInscritos > a.QuantidadeVagas {
+        return errors.New("a quantidade de inscritos não pode ser maior que a quantidade de vagas disponíveis")
+    }
 	if a.Duracao == 0 {
 		return errors.New("duracao é obrigatório")
 	}
@@ -99,3 +106,13 @@ func (a *Atividade) GetIntervalo() (Intervalo, error) {
 		DataFim:    a.HoraTermino,
 	}, nil
 }
+
+func (a *Atividade) Inscricao() error {
+    if a.QuantidadeInscritos >= a.QuantidadeVagas {
+        return errors.New("Não há vagas disponíveis para esta atividade")
+    }
+    a.QuantidadeInscritos++
+    // Salve a atividade atualizada no banco de dados
+    return nil
+}
+

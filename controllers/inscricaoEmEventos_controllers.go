@@ -1,25 +1,20 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
+
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func ExibirInscricaoEmEventos(c *gin.Context) {
 	var inscricaoEmEventos []models.InscricaoEmEvento
 	databasee.DB.Find(&inscricaoEmEventos)
 	c.JSON(200, inscricaoEmEventos)
-}
-
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoInscricaoEmEventos(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
 }
 
 // criar essa nova inscricao em eventos
@@ -93,4 +88,57 @@ func GetInscritosNoEvento(c *gin.Context) {
 
     // Retorna os inscritos para o cliente
     c.JSON(200, inscritos)
+}
+
+// GerarRelatorioInscritosEvento gera um relatório com a lista de usuários inscritos em um evento
+func GerarRelatorioInscritosEvento3(c *gin.Context) {
+	eventoID := c.Params.ByName("evento_id")
+    // eventoIDStr := c.Param("evento_id")
+	// eventoID, err := strconv.Atoi(eventoIDStr)
+    // if err != nil {
+    //     c.JSON(http.StatusBadRequest, gin.H{"error": "ID do evento inválido"})
+    //     return
+    // }
+    
+    // Consultar inscrições para o evento específico
+    var inscricoes []models.InscricaoEmEvento
+    if err := databasee.DB.Where("evento_id = ? ", eventoID).Find(&inscricoes).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar inscrições"})
+        return
+    }
+
+    // Consultar detalhes dos usuários inscritos
+    var usuarios []models.Usuario
+    if err := databasee.DB.Model(&models.Usuario{}).Joins("JOIN inscricao_em_evento ON inscricao_em_eventos.usuario_id = usuarios.id").Where("inscricao_em_eventos.evento_id = ?", eventoID).Find(&usuarios).Error; err != nil {
+        if !errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar detalhes dos usuários"})
+            return
+        }
+    }
+
+	
+
+    // Criar relatório combinando dados de inscrições e usuários
+    relatorio := make([]gin.H, len(inscricoes))
+    for i, inscricao := range inscricoes {
+        relatorio[i] = gin.H{
+            "UsuarioID": inscricao.UsuarioID,
+            "Nome":      findUsuarioNameByID(usuarios, inscricao.UsuarioID),
+            "Status":    inscricao.Status,
+            "Data":      inscricao.Data,
+            "Hora":      inscricao.Hora,
+        }
+    }
+
+    c.JSON(http.StatusOK, relatorio)
+}
+
+// Função auxiliar para encontrar o nome do usuário pelo ID
+func findUsuarioNameByID(usuarios []models.Usuario, usuarioID uint) string {
+    for _, usuario := range usuarios {
+        if usuario.ID == usuarioID {
+            return usuario.Nome
+        }
+    }
+    return "Nome não encontrado"
 }

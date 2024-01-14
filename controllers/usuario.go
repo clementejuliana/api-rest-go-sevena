@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/clementejuliana/api-rest-go-sevena/services"
 	"github.com/gin-gonic/gin"
-	
 )
 
 func ExibirUsuario(c *gin.Context) {
@@ -92,4 +93,52 @@ func BuscarUsuarioPorCPF(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, usuario)
 
+}
+
+func IniciaRecuperacaoSenha(c *gin.Context) {
+	var usuario models.Usuario
+	id := c.Params.ByName("id")
+	databasee.DB.First(&usuario, id)
+
+	if usuario.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Usuário não encontrado",
+		})
+		return
+	}
+
+	// Gera um token único para recuperação de senha
+	tokenRecuperacao, err := services.GeraTokenRecuperacaoSenha()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao gerar token de recuperação de senha"})
+		return
+	}
+
+	// Define a data de expiração para 1 hora a partir de agora
+	dataExpiracao := time.Now().Add(time.Hour * 1)
+
+	// Salva as informações de recuperação de senha no banco de dados
+	recuperacaoSenha := models.RecuperacaoSenha{
+		UsuarioID:     int(usuario.ID),
+		Token:         tokenRecuperacao,
+		Email:         usuario.Email,
+		DataExpiracao: dataExpiracao,
+	}
+
+	// Salva no banco de dados usando o GORM
+	if err := databasee.DB.Create(&recuperacaoSenha).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao salvar informações de recuperação de senha"})
+		return
+	}
+
+	// Gera o link de recuperação
+	linkRecuperacao := fmt.Sprintf("http://localhost:8080/usuario/inicia-recuperacao-senha?token=%s", tokenRecuperacao)
+
+	// Envia um e-mail ao usuário com o link de recuperação
+	if err := services.EnviaEmailRecuperacaoSenha(usuario.Email, linkRecuperacao); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao enviar e-mail de recuperação de senha"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Processo de recuperação de senha iniciado com sucesso"})
 }

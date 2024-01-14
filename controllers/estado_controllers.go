@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	
+
 	"net/http"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
@@ -108,3 +108,4 @@ func CarregarEstados(c *gin.Context) {
 	// Retornar um status OK
 	c.JSON(http.StatusOK, gin.H{"data": "Estados carregados com sucesso"})
 }
+

@@ -121,3 +121,5 @@ func (evento *Evento) HorariosDisponiveis(db *gorm.DB) ([]Evento, error) {
 	// Retorne os horários disponíveis restantes
 	return horariosDisponiveis, nil
 }
+
+

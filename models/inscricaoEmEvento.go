@@ -78,3 +78,4 @@ func (e *Evento) GetInscritos(db *gorm.DB) ([]Usuario, error) {
 
     return usuarios, nil
 }
+

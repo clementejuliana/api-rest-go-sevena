@@ -99,3 +99,13 @@ func CarregarCidades(c *gin.Context) {
 	// Retornar as cidades
 	c.JSON(http.StatusOK, cidades)
 }
+
+func ListarCidades(c *gin.Context) {
+    var cidades []models.Cidade
+    databasee.DB.Find(&cidades)
+    var nomesCidades []string
+    for _, cidade := range cidades {
+        nomesCidades = append(nomesCidades, cidade.Nome)
+    }
+    c.JSON(http.StatusOK, nomesCidades)
+}

@@ -1,7 +1,10 @@
 package services
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
+	"net/smtp"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -56,3 +59,33 @@ func (s *jwtService) ValidaToken(token string) bool {
 	return err == nil
 }
 
+func GeraTokenRecuperacaoSenha() (string, error) {
+    tokenBytes := make([]byte, 32)
+    if _, err := rand.Read(tokenBytes); err != nil {
+        return "", err
+    }
+    return hex.EncodeToString(tokenBytes), nil
+}
+
+func EnviaEmailRecuperacaoSenha(destinatario, linkRecuperacao string) error {
+    // Configurar as informações do servidor de e-mail
+    from := "seuemail@gmail.com"
+    password := "suasenha"
+    host := "smtp.gmail.com"
+    port := 587
+
+    // Configurar a mensagem de e-mail
+    assunto := "Recuperação de Senha"
+    mensagem := fmt.Sprintf("Clique no link para recuperar sua senha: %s", linkRecuperacao)
+
+    // Configurar autenticação
+    auth := smtp.PlainAuth("", from, password, host)
+
+    // Configurar e enviar e-mail
+    err := smtp.SendMail(fmt.Sprintf("%s:%d", host, port), auth, from, []string{destinatario}, []byte(fmt.Sprintf("Subject: %s\n\n%s", assunto, mensagem)))
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
