@@ -83,10 +83,6 @@ func (usuario Usuario) ValidarUsuario() error {
 
 	}
 
-	if len(usuario.Senha) > 20 {
-        return errors.New("senha deve ter no máximo 20 caracteres")
-    }
-
 	// Valida o telefone
 	if len(usuario.Telefone) < 8 {
 		return errors.New("telefone deve ter pelo menos 8 caracteres")
@@ -100,6 +96,20 @@ func (usuario Usuario) ValidarUsuario() error {
 	// Valida a profissão
 	if len(usuario.Profissao) < 3 {
 		return errors.New("profissão deve ter pelo menos 3 caracteres")
+	}
+
+	if len(usuario.Senha) < 6 {
+		return errors.New("Senha deve ter pelo menos 6 caracteres")
+	}
+
+	// Valida se a senha contém pelo menos uma letra maiúscula
+	if !regexp.MustCompile(`[A-Z]`).MatchString(usuario.Senha) {
+		return errors.New("Senha deve conter pelo menos uma letra maiúscula")
+	}
+
+	// Valida se a senha contém pelo menos um caractere especial
+	if !regexp.MustCompile(`[!@#\$%\^&\*]`).MatchString(usuario.Senha) {
+		return errors.New("Senha deve conter pelo menos um caractere especial")
 	}
 
 	// Valida a foto de perfil

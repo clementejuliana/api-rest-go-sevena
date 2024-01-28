@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
@@ -14,6 +13,22 @@ func ExibirAtividade(c *gin.Context) {
 	databasee.DB.Find(&atividade)
 	c.JSON(200, atividade)
 }
+
+func FiltrarAtividade(c *gin.Context) {
+	var atividade []models.Atividade
+	filtro := c.Query("filtro")
+
+	if filtro != "" {
+		databasee.DB.Where("titulo LIKE ?", "%" + filtro + "%").Find(&atividade)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Nenhum filtro fornecido"})
+		return
+	}
+
+	c.JSON(200, atividade)
+}
+
 
 func SaudacaoAtividade(c *gin.Context) {
 	nome := c.Params.ByName("nome")
@@ -30,7 +45,7 @@ func CriarNovaAtividade(c *gin.Context) {
 		return
 	}
 
-	if err := atividade.Preparar(); err != nil{
+	if err := atividade.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid activity data"})
 		return
@@ -59,19 +74,17 @@ func DeleteAtividade(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "Atividade deletada com sucesso"})
 }
 
-func EditarAtividade(c *gin.Context)  {
+func EditarAtividade(c *gin.Context) {
 	var atividade models.Atividade
 	id := c.Params.ByName("id")
 	databasee.DB.First(&atividade, id)
 
-	if err := c.ShouldBindJSON(&atividade); err !=nil {
+	if err := c.ShouldBindJSON(&atividade); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request"})
 		return
 	}
-    databasee.DB.Model(&atividade).Updates(atividade)
+	databasee.DB.Model(&atividade).Updates(atividade)
 	c.JSON(http.StatusOK, atividade)
-	
+
 }
-
-

@@ -74,16 +74,20 @@ func EditarLocal(c *gin.Context)  {
 	
 }
 
-// func BuscarLocalPorCPF(c *gin.Context)  {
-// 	var local models.Local
-// 	cpf := c.Param("cpf")
-// 	databasee.DB.Where(&models.Local{CPF: cpf}).First(&local)
-	
-// 	if local.ID == 00 {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"Not found": "Local Não encontrando"})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, local)
 
-// }
+
+
+func ExibirLocaisDisponiveis(c *gin.Context) {
+	var local []models.Local
+
+	// Adicione a lógica de filtro aqui
+	ativo := c.Query("ativo") // Obtém o parâmetro de consulta 'disponivel'
+
+	if ativo != "" {
+		databasee.DB.Where("ativo = ?", ativo).Find(&local)
+	} else {
+		databasee.DB.Find(&local)
+	}
+
+	c.JSON(200, local)
+}

@@ -1,14 +1,17 @@
 package controllers
 
 import (
-	"bytes"
+
 	//"encoding/json"
 	"fmt"
+	"strconv"
+
 	//"log"
 	"net/http"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
+	"github.com/clementejuliana/api-rest-go-sevena/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -98,11 +101,16 @@ func RelatorioInscritosEmAtividade(c *gin.Context) {
 	var inscricoes []models.InscricaoEmAtividade
 	databasee.DB.Where("id = ?", atividadeID).Find(&inscricoes)
 
+	var local []models.Local
+	if err := databasee.DB.First(&local, atividade.LocalID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	//databasee.DB.First(&local, atividadeID)
+
 	// Criar um slice para armazenar os detalhes dos usuários
 	var usuariosResumidos []UsuarioResumido
 
-	var local []models.Local
-	databasee.DB.First(&local, atividadeID)
 	// Para cada inscrição, buscar os detalhes do usuário e adicionar ao slice
 	for _, inscricao := range inscricoes {
 		var usuario models.Usuario
@@ -118,40 +126,42 @@ func RelatorioInscritosEmAtividade(c *gin.Context) {
 		usuariosResumidos = append(usuariosResumidos, usuarioResumido)
 	}
 
-	// Cria um buffer para armazenar o relatório
-	var buffer bytes.Buffer
+	// Define o cabeçalho "Content-Disposition" para que o arquivo seja baixado com o nome "relatorio.csv"
+	c.Writer.Header().Set("Content-Disposition", "attachment; filename=relatoriodosinscritosporatividades.csv")
 
+	// Define o cabeçalho "Content-Type" para que o arquivo seja salvo como um arquivo CSV
+	c.Writer.Header().Set("Content-Type", "text/csv")
 	quantidadeInscritosFormatada := fmt.Sprintf("%d inscritos", atividade.QuantidadeInscritos)
-	// Escreve o cabeçalho do relatório
-	fmt.Fprintf(&buffer, "Relatório de inscrições em atividade\n\n")
-	fmt.Fprintf(&buffer, "Atividade: %s\n\n", atividade.Titulo)
-	fmt.Fprintf(&buffer, "Ministrante: %s\n\n", atividade.Ministrante)
-	fmt.Fprintf(&buffer, "Data: %s\n\n", atividade.Data.Format("01-01-2006"))
 
-	fmt.Fprintf(&buffer, "Horário: %s\n\n", atividade.HoraInicio.Format("15:00"))
+	// Escreve os cabeçalhos do arquivo CSV
+	fmt.Fprintf(c.Writer, "Atividade:,Ministrante:,Data:,Hora Inicio:,Quantidade dos Inscritos:,Setor:,Sala:\n")
+	// Escreve os detalhes da atividade no arquivo CSV
+	fmt.Fprintf(c.Writer, "%s,%s,%s,%s,%s,%s,%s\n",
+    atividade.Titulo, atividade.Ministrante, atividade.Data.Format("01-01-2006"),
+    atividade.HoraInicio.Format("15:00"),quantidadeInscritosFormatada,atividade.Local.Setor, atividade.Local.Sala)
 
-
-	// Escrever a quantidade de inscritos no relatório
-	fmt.Fprintf(&buffer, "Quantidade de inscritos: %s\n\n", quantidadeInscritosFormatada)
-	// Escreve os detalhes dos usuários no relatório
+	// Escreve os cabeçalhos dos usuários no arquivo CSV
+	fmt.Fprintf(c.Writer, "\nDetalhes dos Inscritos\n")
+	fmt.Fprintf(c.Writer, "Nome,Email\n")
+	// Escreve os detalhes dos usuários no arquivo CSV
 	for _, usuario := range usuariosResumidos {
-		fmt.Fprintf(&buffer, "Nome: %s, Email: %s\n", usuario.Nome, usuario.Email)
+		fmt.Fprintf(c.Writer, "%s,%s\n", usuario.Nome, usuario.Email)
+	}
+}
+
+func ListarInscritosController(c *gin.Context) {
+	atividadeID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de atividade inválido"})
+		return
 	}
 
-	// Converte o buffer para uma string e retorna como resposta
-	c.String(http.StatusOK, buffer.String())
+	inscritos, err := services.ListarInscritos(databasee.DB, atividadeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-	// // Serializar os detalhes dos usuários resumidos como um objeto JSON
-	// usuariosResumidosJSON, err := json.Marshal(usuariosResumidos)
-	// if err != nil {
-	//     log.Println(err)
-	//     c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//     return
-	// }
-
-	// Retornar os dados serializados
-	//c.JSON(http.StatusOK, usuariosResumidosJSON)
-
-	//c.JSON(http.StatusOK, gin.H{"relatorio": buffer.String(), "usuarios": usuariosResumidos})
-	c.JSON(http.StatusOK, usuariosResumidos)
+	c.JSON(http.StatusOK, inscritos)
 }
+

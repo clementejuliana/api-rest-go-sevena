@@ -10,10 +10,12 @@ import (
 
 type ControlePresenca struct {
 	gorm.Model
-	Status        string    `json:"status,omitempty"`
-	HoraEntrada   time.Time `json:"hora_entrada,omitempty"`
-	HoraSaida     time.Time `json:"hora_saida,omitempty"`
-	NotificacaoID uint      `json:"notificacao_id,omitempty"`
+	Status             string                `json:"status,omitempty"`
+	InscricaoAtividade uint                  `json:"inscricao_atividade"`
+	HoraEntrada        time.Time             `json:"hora_entrada,omitempty"`
+	HoraSaida          time.Time             `json:"hora_saida,omitempty"`
+	NotificacaoID      uint                  `json:"notificacao_id,omitempty"`
+	InscricaoEmAtividade *InscricaoEmAtividade `json:"inscricao,omitempty" gorm:"foreignKey:InscricaoAtividade"`
 }
 
 func (controle *ControlePresenca) Preparar() error {
@@ -41,4 +43,3 @@ func (c *ControlePresenca) ValidarControle() error {
 	// adicione mais validações conforme necessário
 	return nil
 }
-

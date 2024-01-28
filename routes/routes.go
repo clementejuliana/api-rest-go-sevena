@@ -2,25 +2,36 @@ package routes
 
 import (
 	"github.com/clementejuliana/api-rest-go-sevena/controllers"
+	"github.com/clementejuliana/api-rest-go-sevena/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 // função que lida com as requisões
 func HandleRequests() {
 	r := gin.Default()
+	// Adicione o middleware ao roteador Gin
+	r.Use(middleware.ContentTypeMiddleware())
+
 	r.POST("/login", controllers.Login)
-	r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosEmAtividade)
+	//r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosEmAtividade)
 	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
 
-
-	//r.GET("/gerar_relatorio", controllers.GerarRelatorioInscricoes(ger))
-	//r.GET("/eventos/:evento_id/relatorio", controllers.GerarRelatorioInscritosEvento)
+	r.GET("/inscritosEvento/:id", controllers.GetInscritosNoEvento)
 	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
-	r.GET("/evento/usuarios-inscritos", controllers.ObterUsuariosInscritosNoEvento)
+
 	r.GET("/cidades", controllers.ListarCidades)
+	// Adiciona a rota para a função FiltrarControlePresenca
+	r.POST("/filtrar-controle-presenca", controllers.FiltrarControlePresenca)
 
+	r.GET("/fltroatividade", controllers.FiltrarAtividade)
+	r.GET("/fltroeventos", controllers.FiltrarEventos)
+	r.GET("/locais/disponiveis", controllers.ExibirLocaisDisponiveis)
 
-	
+	r.POST("/atualizar-presenca-todos/:id", controllers.AtualizarPresencaParaTodos)
+	r.POST("/controle-presenca/:id/presenca", controllers.RegistrarPresenca)
+	r.GET("/controle-presenca/:id/certificado", controllers.GerarCertificado)
+
+	r.GET("/atividade/:id/inscritos", controllers.ListarInscritosController)
 
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
@@ -116,6 +127,7 @@ func HandleRequests() {
 		//controlePresencas.GET("/:id", controllers.BuscarControlePresencaPorID)
 		controlePresencas.DELETE("/:id", controllers.DeleteControlePresenca)
 		controlePresencas.PATCH("/:id", controllers.EditarControlePresenca)
+
 	}
 
 	inscricaoEmEventos := r.Group("/inscricaoEmEventos")
@@ -144,6 +156,6 @@ func HandleRequests() {
 		tipoAtividades.PATCH("/:id", controllers.EditarTipoAtividade)
 	}
 
-	r.Run()
+	r.Run(":8080")
 
 }

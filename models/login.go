@@ -36,10 +36,20 @@ func (login *Login) ValidateLogin() error {
 		return errors.New("E-mail inválido")
 	}
 
-	// Valida se a senha é válida
-	if len(login.Senha) < 6 {
-		return errors.New("Senha deve ter pelo menos 6 caracteres")
-	}
+	// // Valida se a senha é válida
+	// if len(login.Senha) < 6 {
+	// 	return errors.New("Senha deve ter pelo menos 6 caracteres")
+	// }
+
+	// // Valida se a senha contém pelo menos uma letra maiúscula
+	// if !regexp.MustCompile(`[A-Z]`).MatchString(login.Senha) {
+	// 	return errors.New("Senha deve conter pelo menos uma letra maiúscula")
+	// }
+
+	// // Valida se a senha contém pelo menos um caractere especial
+	// if !regexp.MustCompile(`[!@#\$%\^&\*]`).MatchString(login.Senha) {
+	// 	return errors.New("Senha deve conter pelo menos um caractere especial")
+	// }
 
 	return nil
 }

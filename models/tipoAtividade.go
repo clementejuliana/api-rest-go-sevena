@@ -30,6 +30,10 @@ func (tipoAtividade *TipoAtividade) ValidateTipoAtividade() error {
         return errors.New("Nome é obrigatório")
     }
 
+    if tipoAtividade.Status != "ativo" && tipoAtividade.Status != "inativo" {
+		return errors.New("status é obrigatório")
+	}
+
     // Valida se o nome é válido
     if len(tipoAtividade.Nome) < 3 {
         return errors.New("Nome deve ter pelo menos 3 caracteres")

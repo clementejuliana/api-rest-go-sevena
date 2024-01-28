@@ -25,7 +25,7 @@ func (tipoUsuario *TipoUsuario) Preparar() error {
 }
 
 func (tipoUsuario *TipoUsuario) ValidarTipoUsuario() error {
-	if tipoUsuario.Status == "" {
+	if tipoUsuario.Status != "ativo" && tipoUsuario.Status != "inativo" {
 		return errors.New("status é obrigatório")
 	}
 	if tipoUsuario.TipoUsuario == "" {

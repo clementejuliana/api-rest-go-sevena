@@ -156,7 +156,7 @@ CREATE TABLE atividade
 CREATE TABLE controlePresenca
 (
     id SERIAL PRIMARY KEY NOT NULL,
-    status VARCHAR(255) CHECK (status IN ('ativo', 'inativo')),
+    status VARCHAR(255) CHECK (status IN ('presente', 'ausente')),
     hora_entrada TIME NOT NULL,
     hora_saida TIME NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

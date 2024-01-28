@@ -9,12 +9,12 @@ import (
 
 type Local struct {
 	gorm.Model
-	Status      string      `json:"status,omitempty"`
-	Sala        string      `json:"sala,omitempty"`
-	Setor       string      `json:"setor,omitempty"`
-	Atividades  []Atividade `json:"atividades" gorm:"foreignKey:LocalID"`
-	Eventos     []Evento    `json:"eventos" gorm:"foreignKey:LocalID"`
-	DataHoraFim time.Time   `json:"dataHoraFim,omitempty"`
+	Status      string    `json:"status,omitempty"`
+	Sala        string    `json:"sala,omitempty"`
+	Setor       string    `json:"setor,omitempty"`
+	Atividades  []Atividade  `json:"atividades"`
+	Eventos     []Evento  `json:"eventos" gorm:"foreignKey:LocalID"`
+	DataHoraFim time.Time `json:"dataHoraFim,omitempty"`
 }
 
 func (local *Local) Preparar() error {
@@ -30,6 +30,10 @@ func (local *Local) Preparar() error {
 }
 
 func (local *Local) ValidateLocal() error {
+	if local.Status != "ativo" && local.Status != "inativo" {
+		return errors.New("status é obrigatório")
+	}
+
 	if local.Status == "Disponível" {
 		// Verifica se a sala já está reservada para outro evento
 		for _, evento := range local.Eventos {
@@ -37,6 +41,9 @@ func (local *Local) ValidateLocal() error {
 				return errors.New("Sala já está reservada para outro evento no mesmo dia e horário")
 			}
 		}
+	}
+	if local.Status != "ativo" && local.Status != "inativo" {
+		return errors.New("status é obrigatório")
 	}
 	if local.Sala == "" {
 		return errors.New("Sala é obrigatória")

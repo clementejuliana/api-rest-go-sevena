@@ -24,3 +24,12 @@ func Authentication() gin.HandlerFunc {
 
 }
 
+func ContentTypeMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Defina o cabeçalho "Content-type" como "application/json"
+		c.Header("Content-type", "application/json")
+
+		// Chame o próximo manipulador no encadeamento
+		c.Next()
+	}
+}
