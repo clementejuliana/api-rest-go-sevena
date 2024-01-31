@@ -13,6 +13,7 @@ import (
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/clementejuliana/api-rest-go-sevena/services"
 	"github.com/gin-gonic/gin"
+	
 )
 
 func ExibirInscricaoEmAtividade(c *gin.Context) {
@@ -30,6 +31,25 @@ func SaudacaoInscricaoEmAtividade(c *gin.Context) {
 }
 
 // criar essa nova inscricao em atividade
+// func CriarNovaInscricaoEmAtividade(c *gin.Context) {
+// 	var inscricaoEmAtividade models.InscricaoEmAtividade
+// 	if err := c.ShouldBindJSON(&inscricaoEmAtividade); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"error": err.Error()})
+// 		return
+// 	}
+
+// 	if err := inscricaoEmAtividade.Preparar(databasee.DB); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+
+// 	databasee.DB.Create(&inscricaoEmAtividade)
+// 	c.JSON(http.StatusOK, inscricaoEmAtividade)
+// }
+
 func CriarNovaInscricaoEmAtividade(c *gin.Context) {
 	var inscricaoEmAtividade models.InscricaoEmAtividade
 	if err := c.ShouldBindJSON(&inscricaoEmAtividade); err != nil {
@@ -46,8 +66,17 @@ func CriarNovaInscricaoEmAtividade(c *gin.Context) {
 	}
 
 	databasee.DB.Create(&inscricaoEmAtividade)
+
+	// Cria um novo controle de presença para a inscrição
+	controlePresenca := models.ControlePresenca{
+		Status: "Pendente",
+		InscricaoAtividade: inscricaoEmAtividade.ID,
+	}
+	databasee.DB.Create(&controlePresenca)
+
 	c.JSON(http.StatusOK, inscricaoEmAtividade)
 }
+
 
 func BuscarInscricaoEmAtividadePorID(c *gin.Context) {
 	var inscricaoEmAtividade models.InscricaoEmAtividade
@@ -164,4 +193,25 @@ func ListarInscritosController(c *gin.Context) {
 
 	c.JSON(http.StatusOK, inscritos)
 }
+
+
+func ListarPresencas(c *gin.Context) {
+    var controlePresenca []models.ControlePresenca
+    if err := databasee.DB.Where("status = ?", "Presente").Find(&controlePresenca).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, err)
+        return
+    }
+    c.JSON(http.StatusOK, controlePresenca)
+}
+
+
+func ListarPresencaPendente(c *gin.Context) {
+    var controlePresenca []models.ControlePresenca
+    if err := databasee.DB.Where("status = ?", "Pendente").Find(&controlePresenca).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, err)
+        return
+    }
+    c.JSON(http.StatusOK, controlePresenca)
+}
+
 

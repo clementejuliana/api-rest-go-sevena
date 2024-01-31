@@ -3,9 +3,11 @@ package controllers
 import (
 	"net/http"
 
+
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/gin-gonic/gin"
+	
 )
 
 func ExibirAtividade(c *gin.Context) {
@@ -88,3 +90,4 @@ func EditarAtividade(c *gin.Context) {
 	c.JSON(http.StatusOK, atividade)
 
 }
+

@@ -7,6 +7,7 @@ import (
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/gin-gonic/gin"
+	"github.com/jung-kurt/gofpdf"
 )
 
 func ExibirInscricaoEmEventos(c *gin.Context) {
@@ -108,4 +109,99 @@ func GetInscritosNoEvento(c *gin.Context) {
 
 	// Retorna os inscritos para o cliente
 	//  c.JSON(200, inscritos)
+}
+
+func GerarCertificad(c *gin.Context) {
+    // Obtém o ID do evento da URL
+    eventoID := c.Param("id")
+
+    // Busca o evento no banco de dados
+    evento := models.Evento{}
+    if err := databasee.DB.Where("id = ?", eventoID).First(&evento).Error; err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Busca os inscritos no evento
+    inscritos, err := evento.GetInscritos(databasee.DB)
+    if err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Define o cabeçalho "Content-Disposition" para que o arquivo seja baixado com o nome "certificados.csv"
+    c.Writer.Header().Set("Content-Disposition", "attachment; filename=certificados.csv")
+
+    // Define o cabeçalho "Content-Type" para que o arquivo seja salvo como um arquivo CSV
+    c.Writer.Header().Set("Content-Type", "text/csv")
+
+	// Escreve os cabeçalhos do arquivo CSV
+    fmt.Fprintf(c.Writer, "Certificado\n")
+    // Escreve os cabeçalhos do arquivo CSV
+    fmt.Fprintf(c.Writer, "Nome do Usuário,Nome do Evento,Nome da Atividade,Data do Evento,Carga Horária\n")
+
+    // Escreve os dados dos inscritos no arquivo CSV
+    for _, inscrito := range inscritos {
+        atividade := models.Atividade{} // Substitua isso pela lógica correta para obter a atividade do inscrito
+		fmt.Fprintf(c.Writer, "%s,%s,%s,%s,%d\n",
+		inscrito.Nome, evento.Nome, atividade.Titulo, evento.DataInicio.Format("01-01-2006"), atividade.CargaHoraria)
+	}
+}
+
+func GerarCertificado(c *gin.Context) {
+    // Obtém o ID do evento da URL
+    eventoID := c.Param("id")
+
+    // Busca o evento no banco de dados
+    evento := models.Evento{}
+    if err := databasee.DB.Where("id = ?", eventoID).First(&evento).Error; err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Busca os inscritos no evento
+    inscritos, err := evento.GetInscritos(databasee.DB)
+    if err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Para cada inscrito, gera um certificado em PDF
+    for _, inscrito := range inscritos {
+        atividade := models.Atividade{} // Substitua isso pela lógica correta para obter a atividade do inscrito
+		pdf := gofpdf.New("P", "mm", "A4", "")
+		pdf.AddPage()
+	
+		// Configuração de fonte e estilo
+		pdf.SetFont("Arial", "B", 20)
+		
+		// Título do certificado
+		pdf.Cell(0, 10, "Certificado de Participação do Evento")
+		pdf.Ln(20) // Espaçamento entre linhas
+	
+		// Configuração de fonte e estilo para informações detalhadas
+		pdf.SetFont("Arial", "", 16)
+	
+		// Informações do certificado
+		pdf.Cell(0, 10, "Certificamos que : " + inscrito.Nome)
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Participou do Evento: " + evento.Nome)
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Participando da Atividade: " + atividade.Titulo)
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Data do Evento: " + evento.DataInicio.Format("02 de janeiro de 2006"))
+		pdf.Ln(10)
+		pdf.Cell(0, 10, "Carga Horária: " + fmt.Sprintf("%d", atividade.CargaHoraria) + " horas")
+	
+	
+
+        // Salva o PDF
+        err := pdf.OutputFileAndClose("certificado_" + inscrito.Nome + ".pdf")
+        if err != nil {
+            c.JSON(500, gin.H{"error": err.Error()})
+            return
+        }
+    }
+
+    c.JSON(200, gin.H{"message": "Certificados gerados com sucesso"})
 }

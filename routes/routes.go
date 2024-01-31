@@ -17,11 +17,11 @@ func HandleRequests() {
 	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
 
 	r.GET("/inscritosEvento/:id", controllers.GetInscritosNoEvento)
+	r.GET("/eventos/:id/certificados", controllers.GerarCertificado)
 	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
 
 	r.GET("/cidades", controllers.ListarCidades)
-	// Adiciona a rota para a função FiltrarControlePresenca
-	r.POST("/filtrar-controle-presenca", controllers.FiltrarControlePresenca)
+	
 
 	r.GET("/fltroatividade", controllers.FiltrarAtividade)
 	r.GET("/fltroeventos", controllers.FiltrarEventos)
@@ -29,9 +29,14 @@ func HandleRequests() {
 
 	r.POST("/atualizar-presenca-todos/:id", controllers.AtualizarPresencaParaTodos)
 	r.POST("/controle-presenca/:id/presenca", controllers.RegistrarPresenca)
-	r.GET("/controle-presenca/:id/certificado", controllers.GerarCertificado)
+	//r.GET("/gerarCertificado/:id", controllers.GerarCertificado)
 
 	r.GET("/atividade/:id/inscritos", controllers.ListarInscritosController)
+	r.GET("/listarPresencas", controllers.ListarPresencas)
+	r.GET("/listarPendente", controllers.ListarPresencaPendente)
+	r.GET("/gerarCertificado/:id", controllers.GerarCertificadooo)
+
+
 
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
