@@ -22,33 +22,6 @@ func ExibirInscricaoEmAtividade(c *gin.Context) {
 	c.JSON(200, inscricaoEmAtividade)
 }
 
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoInscricaoEmAtividade(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
-
-// criar essa nova inscricao em atividade
-// func CriarNovaInscricaoEmAtividade(c *gin.Context) {
-// 	var inscricaoEmAtividade models.InscricaoEmAtividade
-// 	if err := c.ShouldBindJSON(&inscricaoEmAtividade); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"error": err.Error()})
-// 		return
-// 	}
-
-// 	if err := inscricaoEmAtividade.Preparar(databasee.DB); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	databasee.DB.Create(&inscricaoEmAtividade)
-// 	c.JSON(http.StatusOK, inscricaoEmAtividade)
-// }
 
 func CriarNovaInscricaoEmAtividade(c *gin.Context) {
 	var inscricaoEmAtividade models.InscricaoEmAtividade

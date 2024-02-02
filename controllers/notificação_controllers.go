@@ -14,15 +14,6 @@ func ExibirNotificacao(c *gin.Context) {
 	c.JSON(200, notificacao)
 }
 
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoNotificacao(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
-
-// criar essa nova notificacao
 func CriarNovaNotificacao(c *gin.Context) {
 	var notificacao models.Notificacao
 	if err := c.ShouldBindJSON(&notificacao); err != nil {

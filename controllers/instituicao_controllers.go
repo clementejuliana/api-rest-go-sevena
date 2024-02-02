@@ -15,14 +15,6 @@ func ExibirInstuicao(c *gin.Context) {
 
 }
 
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoInstituicao(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
-
 // criar esse novo aluno
 func CriarNovaInstituicao(c *gin.Context) {
 	var instituicao models.Instituicao

@@ -3,13 +3,11 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
-	"github.com/clementejuliana/api-rest-go-sevena/services"
 	"github.com/gin-gonic/gin"
 	"github.com/jung-kurt/gofpdf"
 )
@@ -63,107 +61,6 @@ func EditarControlePresenca(c *gin.Context)  {
 	
 }
 
-func RegistrarPresencak(c *gin.Context) {
-	var controlePresenca models.ControlePresenca
-	id := c.Params.ByName("id")
-	status := c.Query("status") // Adicione esta linha
-
-	if status != "Presente" && status != "Ausente" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Status inválido. Deve ser 'Presente' ou 'Ausente'."})
-		return
-	}
-
-	databasee.DB.First(&controlePresenca, id)
-
-	controlePresenca.Status = status
-	if status == "Presente" {
-		controlePresenca.HoraEntrada = time.Now()
-	} else {
-		controlePresenca.HoraSaida = time.Now()
-	}
-
-	databasee.DB.Save(&controlePresenca)
-
-	c.JSON(http.StatusOK, gin.H{"status": "Presença registrada com sucesso"})
-}
-
-
-func GerarCertificado8(c *gin.Context) {
-	var controlePresenca models.ControlePresenca
-	id := c.Params.ByName("id")
-	databasee.DB.First(&controlePresenca, id)
-
-	if controlePresenca.Status != "Presente" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Não é possível gerar certificado, presença não registrada"})
-		return
-	}
-
-	// Aqui você pode adicionar o código para gerar o certificado.
-	// Isso dependerá de como você deseja que os certificados sejam formatados e entregues.
-
-	c.JSON(http.StatusOK, gin.H{"status": "Certificado gerado com sucesso"})
-}
-
-func GerarCertificadooo(c *gin.Context) {
-	inscricaoID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de inscrição inválido"})
-		return
-	}
-
-	var controle models.ControlePresenca
-	databasee.DB.First(&controle, inscricaoID)
-
-	if controle.Status != "Presente" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Não é possível gerar certificado, presença não registrada"})
-		return
-	}
-
-	// Gerar o certificado
-	//certificado, err := services.GerarCertificadoPDF(controle.InscricaoEmAtividade.Usuario.Nome, controle.InscricaoEmAtividade.Atividade)
-	// certificado, err := services.GerarCertificadoPDF(controle.InscricaoEmAtividade.Usuario.Nome, controle.InscricaoEmAtividade.Atividade.Titulo)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	if controle.InscricaoEmAtividade == nil || controle.InscricaoEmAtividade.Usuario == nil || controle.InscricaoEmAtividade.Atividade == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "InscricaoEmAtividade, Usuario ou Atividade é nil"})
-		return
-	}
-	
-	nome := controle.InscricaoEmAtividade.Usuario.Nome
-	titulo := controle.InscricaoEmAtividade.Atividade.Titulo
-	
-	if nome == "" || titulo == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Nome ou Titulo está vazio"})
-		return
-	}
-	
-	certificado, err := services.GerarCertificadoPDF(nome, titulo)
-	
-
-	// Salvar o certificado em um local temporário
-	caminhoTemp := "/tmp/certificado_" + strconv.Itoa(inscricaoID) + ".pdf"
-	err = services.SalvarCertificado(certificado, caminhoTemp)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// // Enviar o certificado por e-mail
-	// err = services.EnviarCertificadoPorEmail(caminhoTemp, controle.Email)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	c.JSON(http.StatusOK, gin.H{"message": "Certificado gerado com sucesso"})
-}
-
 
 func RegistrarPresenca(c *gin.Context) {
 	inscricaoID, err := strconv.Atoi(c.Param("id"))
@@ -198,36 +95,6 @@ func RegistrarPresenca(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Presença atualizada com sucesso"})
-}
-
-
-
-func AtualizarPresencaParaTodos(c *gin.Context) {
-	atividadeID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de atividade inválido"})
-		return
-	}
-
-	// Obter a lista de inscritos
-	inscritos, err := services.ListarInscritos(databasee.DB, atividadeID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Percorrer a lista de inscritos
-	for _, inscricao := range inscritos {
-		// Atualizar o contexto com os parâmetros da inscrição
-		c.Set("id", inscricao.ID)
-		c.Request.PostForm = make(url.Values)
-		c.Request.PostForm.Add("compareceu", "true") // ou "false" se o usuário não compareceu
-
-		// Chamar a função RegistrarPresenca
-		RegistrarPresenca(c)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Presença atualizada para todos os inscritos"})
 }
 
 

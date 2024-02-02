@@ -12,8 +12,6 @@ type Local struct {
 	Status      string    `json:"status,omitempty"`
 	Sala        string    `json:"sala,omitempty"`
 	Setor       string    `json:"setor,omitempty"`
-	Atividades  []Atividade  `json:"atividades"`
-	Eventos     []Evento  `json:"eventos" gorm:"foreignKey:LocalID"`
 	DataHoraFim time.Time `json:"dataHoraFim,omitempty"`
 }
 
@@ -34,14 +32,14 @@ func (local *Local) ValidateLocal() error {
 		return errors.New("status é obrigatório")
 	}
 
-	if local.Status == "Disponível" {
-		// Verifica se a sala já está reservada para outro evento
-		for _, evento := range local.Eventos {
-			if evento.HoraInicio.Before(local.DataHoraFim) && evento.HoraFim.After(local.DataHoraFim) {
-				return errors.New("Sala já está reservada para outro evento no mesmo dia e horário")
-			}
-		}
-	}
+	// if local.Status == "Disponível" {
+	// 	// Verifica se a sala já está reservada para outro evento
+	// 	for _, evento := range local.Eventos {
+	// 		if evento.HoraInicio.Before(local.DataHoraFim) && evento.HoraFim.After(local.DataHoraFim) {
+	// 			return errors.New("Sala já está reservada para outro evento no mesmo dia e horário")
+	// 		}
+	// 	}
+	// }
 	if local.Status != "ativo" && local.Status != "inativo" {
 		return errors.New("status é obrigatório")
 	}

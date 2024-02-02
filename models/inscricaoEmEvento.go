@@ -12,10 +12,8 @@ type InscricaoEmEvento struct {
 	Status    string    `json:"status,omitempty"`
 	Data      time.Time `json:"data,omitempty"`
 	Hora      time.Time `json:"hora,omitempty"`
-	Evento    Evento
-	EventoID  uint `json:"evento_id,omitempty"`
-	Usuario   Usuario
-	UsuarioID uint `json:"usuario_id,omitempty"`
+	EventoID  int       `json:"evento_id" gorm:"foreignKey:EventoID"`
+	UsuarioID uint      `json:"usuario_id" gorm:"foreignKey:UsuarioID"`
 }
 
 func (inscricaoEvento *InscricaoEmEvento) Preparar() error {
@@ -49,7 +47,6 @@ func (i *InscricaoEmEvento) ValidarInscricaoEvento() error {
 	if i.EventoID == 0 {
 		return errors.New("evento é obrigatório")
 	}
-	
 
 	// Verifica se o ID do usuário é válido
 	if i.UsuarioID == 0 {
@@ -59,23 +56,22 @@ func (i *InscricaoEmEvento) ValidarInscricaoEvento() error {
 	return nil
 }
 func (e *Evento) GetInscritos(db *gorm.DB) ([]Usuario, error) {
-    var usuarios []Usuario
+	var usuarios []Usuario
 
-    // Busca todas as inscrições para o evento atual
-    inscricoes := []InscricaoEmEvento{}
-    if err := db.Where("evento_id = ?", e.ID).Find(&inscricoes).Error; err != nil {
-        return nil, err
-    }
+	// Busca todas as inscrições para o evento atual
+	inscricoes := []InscricaoEmEvento{}
+	if err := db.Where("evento_id = ?", e.ID).Find(&inscricoes).Error; err != nil {
+		return nil, err
+	}
 
-    // Para cada inscrição, busca o usuário correspondente
-    for _, inscricao := range inscricoes {
-        usuario := Usuario{}
-        if err := db.Where("id = ?", inscricao.UsuarioID).First(&usuario).Error; err != nil {
-            return nil, err
-        }
-        usuarios = append(usuarios, usuario)
-    }
+	// Para cada inscrição, busca o usuário correspondente
+	for _, inscricao := range inscricoes {
+		usuario := Usuario{}
+		if err := db.Where("id = ?", inscricao.UsuarioID).First(&usuario).Error; err != nil {
+			return nil, err
+		}
+		usuarios = append(usuarios, usuario)
+	}
 
-    return usuarios, nil
+	return usuarios, nil
 }
-

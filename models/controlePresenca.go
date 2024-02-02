@@ -15,9 +15,9 @@ type ControlePresenca struct {
 	HoraEntrada        time.Time             `json:"hora_entrada,omitempty"`
 	HoraSaida          time.Time             `json:"hora_saida,omitempty"`
 	NotificacaoID      uint                  `json:"notificacao_id,omitempty"`
-	InscricaoEmAtividade *InscricaoEmAtividade `json:"inscricao,omitempty" gorm:"foreignKey:InscricaoAtividade"`
+	InscricaoEmAtividade *InscricaoEmAtividade `json:"inscricao,omitempty" `
 }
-
+//gorm:"foreignKey:InscricaoAtividade"
 func (controle *ControlePresenca) Preparar() error {
 	// Chama a função
 	err := controle.ValidarControle()

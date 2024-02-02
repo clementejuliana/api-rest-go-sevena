@@ -32,15 +32,6 @@ func FiltrarEventos(c *gin.Context) {
 	c.JSON(200, evento)
 }
 
-
-//exibir uma mensagem quando está passando um valoe não valido
-func SaudacaoEventos(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-	})
-}
-
 // criar esse novo aluno
 func CriarNovoEvento(c *gin.Context) {
 	var evento models.Evento
@@ -92,19 +83,3 @@ func EditarEvento(c *gin.Context)  {
 	c.JSON(http.StatusOK, evento)
 	
 }
-
-
-
-
-// // Função auxiliar para encontrar o nome do usuário pelo ID
-// func findUsuarioNameByID(usuarios []models.Usuario, usuarioID uint) string {
-//     for _, usuario := range usuarios {
-//         if usuario.ID == usuarioID {
-//             return usuario.Nome
-//         }
-//     }
-//     return "Nome não encontrado"
-// }
-
-// ObterUsuariosInscritosNoEvento obtém a lista de usuários inscritos em um evento
-

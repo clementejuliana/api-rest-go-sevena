@@ -43,13 +43,13 @@ func CriarNovaAtividade(c *gin.Context) {
 	var atividade models.Atividade
 	if err := c.ShouldBindJSON(&atividade); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request"})
+			"error": err.Error()})
 		return
 	}
 
 	if err := atividade.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid activity data"})
+			"error": err.Error()})
 		return
 	}
 	databasee.DB.Create(&atividade)

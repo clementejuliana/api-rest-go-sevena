@@ -26,7 +26,7 @@ type Usuario struct {
 	TipoUsuarioID  int           `json:"tipo_usuario_id,omitempty"`
 	InstituicaoID  int           `json:"instituicao_id,omitempty"`
 	CidadeID       int           `json:"cidadeid,omitempty"`
-	Instituicoes   []Instituicao `gorm:"many2many:instituicao_usuarios;"`
+	
 }
 
 func (usuario *Usuario) Preparar() error {

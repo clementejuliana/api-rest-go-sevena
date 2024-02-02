@@ -10,7 +10,7 @@ type TipoUsuario struct {
 	gorm.Model
 	Status      string    `json:"status,omitempty"`
 	TipoUsuario string    `json:"tipo_usuario,omitempty" gorm:"unique"` // Tipo de usuário deve ser único
-	Usuarios    []Usuario `gorm:"foreignkey:TipoUsuarioID"`
+	//Usuarios    []Usuario `gorm:"foreignkey:TipoUsuarioID"`
 }
 
 func (tipoUsuario *TipoUsuario) Preparar() error {

@@ -15,7 +15,6 @@ type Evento struct {
 	DataInicio time.Time `json:"data_inicio,omitempty"`
 	DataFinal  time.Time `json:"data_final,omitempty"`
 	LocalID    int       `json:"local_id" gorm:"foreignKey:LocalID"`
-	Local      Local     `json:"local,omitempty"`
 	HoraInicio time.Time `json:"horaInicio"`
 	HoraFim    time.Time `json:"horaFim"`
 }
@@ -121,5 +120,3 @@ func (evento *Evento) HorariosDisponiveis(db *gorm.DB) ([]Evento, error) {
 	// Retorne os horários disponíveis restantes
 	return horariosDisponiveis, nil
 }
-
-

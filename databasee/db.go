@@ -36,7 +36,6 @@ func ConexaoBD () {
 	DB.AutoMigrate(&models.InscricaoEmAtividade{})
 	DB.AutoMigrate(&models.InscricaoEmEvento{})
 	DB.AutoMigrate(&models.Local{})
-	DB.AutoMigrate(&models.Notificacao{})
 	DB.AutoMigrate(&models.RecuperacaoSenha{})
 	DB.AutoMigrate(&models.TipoAtividade{})
 	

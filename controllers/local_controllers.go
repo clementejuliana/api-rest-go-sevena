@@ -74,9 +74,6 @@ func EditarLocal(c *gin.Context)  {
 	
 }
 
-
-
-
 func ExibirLocaisDisponiveis(c *gin.Context) {
 	var local []models.Local
 

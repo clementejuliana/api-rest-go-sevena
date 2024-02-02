@@ -8,7 +8,7 @@ import (
 )
 
 type Atividade struct {
-	gorm.Model                        `json:"atividade_id,omitempty"`
+	gorm.Model         
 	Status              string        `json:"status,omitempty"`
 	TipoAtividade       TipoAtividade `json:"tipo_atividade,omitempty"`
 	TipoAtividadeID     int           `json:"tipo_atividade_id,omitempty"`
@@ -24,9 +24,8 @@ type Atividade struct {
 	Duracao             float64       `json:"duracao,omitempty"`
 	CargaHoraria        int           `json:"carga_horaria,omitempty"`
 	QuantidadeInscritos int           `json:"quantidade_inscritos,omitempty"`
+	LocalID             int           `json:"local_id" gorm:"foreignKey:LocalID"`
 	Local               Local         `json:"local,omitempty"`
-	LocalID             int           `json:"local_id,omitempty"`
-	
 }
 
 func (atividade *Atividade) Preparar() error {
@@ -37,9 +36,6 @@ func (atividade *Atividade) Preparar() error {
 		return err
 	}
 
-	
-
-	
 	// Retorna nil se não houver erros
 	return nil
 }
@@ -83,8 +79,8 @@ func (a *Atividade) ValidarAtividade() error {
 		return errors.New("quantidade_vagas é obrigatório")
 	}
 	if a.QuantidadeInscritos > a.QuantidadeVagas {
-        return errors.New("a quantidade de inscritos não pode ser maior que a quantidade de vagas disponíveis")
-    }
+		return errors.New("a quantidade de inscritos não pode ser maior que a quantidade de vagas disponíveis")
+	}
 	if a.Duracao == 0 {
 		return errors.New("duracao é obrigatório")
 	}
@@ -108,11 +104,10 @@ func (a *Atividade) GetIntervalo() (Intervalo, error) {
 }
 
 func (a *Atividade) Inscricao() error {
-    if a.QuantidadeInscritos >= a.QuantidadeVagas {
-        return errors.New("Não há vagas disponíveis para esta atividade")
-    }
-    a.QuantidadeInscritos++
-    // Salve a atividade atualizada no banco de dados
-    return nil
+	if a.QuantidadeInscritos >= a.QuantidadeVagas {
+		return errors.New("Não há vagas disponíveis para esta atividade")
+	}
+	a.QuantidadeInscritos++
+	// Salve a atividade atualizada no banco de dados
+	return nil
 }
-

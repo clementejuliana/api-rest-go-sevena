@@ -14,14 +14,6 @@ func ExibirAdministrador(c *gin.Context) {
 	c.JSON(200, administrador)
 }
 
-// //exibir uma mensagem quando está passando um valor não valido
-// func SaudacaoAdministrador(c *gin.Context) {
-// 	nome := c.Params.ByName("nome")
-// 	c.JSON(200, gin.H{
-// 		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-// 	})
-// }
-
 // criar esse novo administrador
 func CriarNovoAdministrador(c *gin.Context) {
 	var administrador models.Administrador
@@ -68,15 +60,3 @@ func EditarAdministrador(c *gin.Context)  {
 	c.JSON(http.StatusOK, administrador)
 	
 }
-
-// func BuscarAdministradorPorCPF(c *gin.Context)  {
-// 	var administrador models.Administrador
-// 	cpf := c.Param("cpf")
-// 	databasee.DB.Where(&models.Administrador{CPF: cpf}).First(&administrador)
-	
-// 	if administrador.ID == 00 {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"Not found": "Administrador Não encontrando"})
-// 		return
-// 	}
-	// 	c.JSON(http.StatusOK, administrador)

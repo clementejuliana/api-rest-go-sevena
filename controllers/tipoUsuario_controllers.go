@@ -15,14 +15,6 @@ func ExibirTipoUsuario(c *gin.Context) {
 
 }
 
-//exibir uma mensagem quando está passando um valoe não valido
-// func Saudacao(c *gin.Context) {
-// 	nome := c.Params.ByName("nome")
-// 	c.JSON(200, gin.H{
-// 		"API diz:": "Tudo bem " + nome + ", tudo beleza?",
-// 	})
-// }
-
 // criar esse novo aluno
 func CriarTipoUsuario(c *gin.Context) {
 	var tipoUsuario models.TipoUsuario
@@ -75,16 +67,3 @@ func EditarTipoUsuario(c *gin.Context) {
 
 }
 
-func BuscarTipoUsuarioPorCPF(c *gin.Context) {
-	var tipoUsuario models.TipoUsuario
-	cpf := c.Param("cpf")
-	databasee.DB.Where(&models.Usuario{CPF: cpf}).First(&tipoUsuario)
-
-	if tipoUsuario.ID == 00 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"Not found": "Tipo de Usuario não encontrando"})
-		return
-	}
-	c.JSON(http.StatusOK, tipoUsuario)
-
-}

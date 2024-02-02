@@ -11,31 +11,29 @@ func HandleRequests() {
 	r := gin.Default()
 	// Adicione o middleware ao roteador Gin
 	r.Use(middleware.ContentTypeMiddleware())
+	r.Use(middleware.CORSMiddleware())
+	//r.Use(middleware.Authentication())
 
-	r.POST("/login", controllers.Login)
+	r.POST("/login",  controllers.Login)
 	//r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosEmAtividade)
 	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
 
 	r.GET("/inscritosEvento/:id", controllers.GetInscritosNoEvento)
-	r.GET("/eventos/:id/certificados", controllers.GerarCertificado)
+	r.GET("/eventos/:id/certificados",controllers.GerarCertificado)
 	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
 
 	r.GET("/cidades", controllers.ListarCidades)
-	
 
 	r.GET("/fltroatividade", controllers.FiltrarAtividade)
 	r.GET("/fltroeventos", controllers.FiltrarEventos)
 	r.GET("/locais/disponiveis", controllers.ExibirLocaisDisponiveis)
 
-	r.POST("/atualizar-presenca-todos/:id", controllers.AtualizarPresencaParaTodos)
 	r.POST("/controle-presenca/:id/presenca", controllers.RegistrarPresenca)
 	//r.GET("/gerarCertificado/:id", controllers.GerarCertificado)
 
 	r.GET("/atividade/:id/inscritos", controllers.ListarInscritosController)
 	r.GET("/listarPresencas", controllers.ListarPresencas)
 	r.GET("/listarPendente", controllers.ListarPresencaPendente)
-	r.GET("/gerarCertificado/:id", controllers.GerarCertificadooo)
-
 
 
 	// Grupo de rotas de usuário
