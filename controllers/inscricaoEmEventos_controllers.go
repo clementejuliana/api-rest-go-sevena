@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	
 	"fmt"
 	"net/http"
+
+	"time"
 
 	"github.com/clementejuliana/api-rest-go-sevena/databasee"
 	"github.com/clementejuliana/api-rest-go-sevena/models"
@@ -16,6 +19,20 @@ func ExibirInscricaoEmEventos(c *gin.Context) {
 	c.JSON(200, inscricaoEmEventos)
 }
 
+// Função para converter a data e a hora para o formato desejado
+func ConverterDataHora(data string, hora string) (time.Time, error) {
+	// Concatena a data e a hora
+	dataHora := fmt.Sprintf("%sT%s:00Z07:00", data, hora)
+
+	// Converte para o formato time.Time
+	t, err := time.Parse("2023-10-10T21:00:00-03:00", dataHora)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return t, nil
+}
+
 // criar essa nova inscricao em eventos
 func CriarNovaInscricaoEmEventos(c *gin.Context) {
 	var inscricaoEmEventos models.InscricaoEmEvento
@@ -24,6 +41,8 @@ func CriarNovaInscricaoEmEventos(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
+
+	
 	if err := inscricaoEmEventos.Preparar(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
@@ -68,6 +87,7 @@ func EditarInscricaoEmEventos(c *gin.Context) {
 
 }
 
+
 type localDetails struct {
 	Setor string `json:"setor"`
 	Sala  string  `json:"sala"`
@@ -104,7 +124,7 @@ func GetInscritosNoEvento(c *gin.Context) {
 	for _, inscrito := range inscritos {
 		
 		fmt.Fprintf(c.Writer, "%s,%s,%s,%s\n",
-			inscrito.Nome, evento.Nome, evento.DataInicio.Format("01-01-2006"), evento.HoraInicio.Format("15:00"))
+			inscrito.Nome, evento.Nome, evento.DataInicio, evento.HoraInicio)
 	}
 
 	// Retorna os inscritos para o cliente
@@ -153,7 +173,7 @@ func GerarCertificado(c *gin.Context) {
 		pdf.Ln(10)
 		pdf.Cell(0, 10, "Participando da Atividade: " + atividade.Titulo)
 		pdf.Ln(10)
-		pdf.Cell(0, 10, "Data do Evento: " + evento.DataInicio.Format("02 de janeiro de 2006"))
+		pdf.Cell(0, 10, "Data do Evento: " + evento.DataInicio)
 		pdf.Ln(10)
 		pdf.Cell(0, 10, "Carga Horária: " + fmt.Sprintf("%d", atividade.CargaHoraria) + " horas")
 	
@@ -169,3 +189,5 @@ func GerarCertificado(c *gin.Context) {
 
     c.JSON(200, gin.H{"message": "Certificados gerados com sucesso"})
 }
+
+

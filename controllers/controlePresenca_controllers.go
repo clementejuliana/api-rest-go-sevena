@@ -1,6 +1,7 @@
 package controllers
 
 import (
+
 	"fmt"
 	"net/http"
 	"strconv"
@@ -82,8 +83,9 @@ func RegistrarPresenca(c *gin.Context) {
 	// Atualizar o status e as horas de entrada e saída conforme a presença
 	if compareceu {
 		controle.Status = "Presente"
-		controle.HoraEntrada = time.Now()
-		controle.HoraSaida = time.Now()
+		controle.HoraEntrada = time.Now().Format("2006-01-02T15:04:05")
+		controle.HoraSaida = time.Now().Format("2006-01-02T15:04:05")
+	
 	} else {
 		controle.Status = "Ausente"
 	}
@@ -139,7 +141,7 @@ func GerarCertificadoPresenca(c *gin.Context) {
 		pdf.Ln(10)
 		pdf.Cell(0, 10, "Participando da Atividade: " + atividade.Titulo)
 		pdf.Ln(10)
-		pdf.Cell(0, 10, "Data do Evento: " + evento.DataInicio.Format("02 de janeiro de 2006"))
+		pdf.Cell(0, 10, "Data do Evento: " + evento.DataInicio)
 		pdf.Ln(10)
 		pdf.Cell(0, 10, "Carga Horária: " + fmt.Sprintf("%d", atividade.CargaHoraria) + " horas")
 	

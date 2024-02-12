@@ -83,3 +83,15 @@ func EditarEvento(c *gin.Context)  {
 	c.JSON(http.StatusOK, evento)
 	
 }
+
+func LocaisDisponiveisParaEvento(c *gin.Context) {
+    var locais []models.Local
+
+    // Consulta o banco de dados para obter os locais disponíveis
+    if err := databasee.DB.Find(&locais).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao obter locais disponíveis"})
+        return
+    }
+
+    c.JSON(http.StatusOK, locais)
+}

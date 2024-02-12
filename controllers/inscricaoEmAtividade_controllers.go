@@ -2,7 +2,8 @@ package controllers
 
 import (
 
-	//"encoding/json"
+	
+
 	"fmt"
 	"strconv"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/clementejuliana/api-rest-go-sevena/models"
 	"github.com/clementejuliana/api-rest-go-sevena/services"
 	"github.com/gin-gonic/gin"
-	
 )
 
 func ExibirInscricaoEmAtividade(c *gin.Context) {
@@ -86,6 +86,8 @@ func EditarInscricaoEmAtividade(c *gin.Context) {
 
 }
 
+
+
 type UsuarioResumido struct {
 	Nome  string `json:"nome"`
 	Email string `json:"email"`
@@ -139,8 +141,8 @@ func RelatorioInscritosEmAtividade(c *gin.Context) {
 	fmt.Fprintf(c.Writer, "Atividade:,Ministrante:,Data:,Hora Inicio:,Quantidade dos Inscritos:,Setor:,Sala:\n")
 	// Escreve os detalhes da atividade no arquivo CSV
 	fmt.Fprintf(c.Writer, "%s,%s,%s,%s,%s,%s,%s\n",
-    atividade.Titulo, atividade.Ministrante, atividade.Data.Format("01-01-2006"),
-    atividade.HoraInicio.Format("15:00"),quantidadeInscritosFormatada,atividade.Local.Setor, atividade.Local.Sala)
+    atividade.Titulo, atividade.Ministrante, atividade.Data,
+    atividade.HoraInicio,quantidadeInscritosFormatada,atividade.Local.Setor, atividade.Local.Sala)
 
 	// Escreve os cabeçalhos dos usuários no arquivo CSV
 	fmt.Fprintf(c.Writer, "\nDetalhes dos Inscritos\n")
@@ -186,5 +188,4 @@ func ListarPresencaPendente(c *gin.Context) {
     }
     c.JSON(http.StatusOK, controlePresenca)
 }
-
 

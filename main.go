@@ -13,6 +13,10 @@ import (
 )
 
 func main() {
+
+
+
+	
 	databasee.ConexaoBD()
 	// Carregue as variáveis de ambiente do arquivo .env
 	err := godotenv.Load()

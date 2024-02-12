@@ -1,56 +1,66 @@
 package routes
 
 import (
+	"github.com/clementejuliana/api-rest-go-sevena/authentication"
 	"github.com/clementejuliana/api-rest-go-sevena/controllers"
 	"github.com/clementejuliana/api-rest-go-sevena/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-// função que lida com as requisões
+// HandleRequests é a função que lida com todas as requisições HTTP
 func HandleRequests() {
+	//cria um novo roteador GIN
 	r := gin.Default()
-	// Adicione o middleware ao roteador Gin
+	// Adiciona o middleware ao roteador Gin
 	r.Use(middleware.ContentTypeMiddleware())
+	// Verifica o tipo de conteúdo das requisições
+
+	// Permite requisições de diferentes origens (Cross-Origin)
 	r.Use(middleware.CORSMiddleware())
-	//r.Use(middleware.Authentication())
 
-	r.POST("/login",  controllers.Login)
-	//r.GET("/relatorio_inscritos_por_atividade", controllers.RelatorioInscritosEmAtividade)
-	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
+	// Define as rotas e suas respectivas funções de controle
+	// Rota para login de usuários
+	r.POST("/login", controllers.Login)
 
-	r.GET("/inscritosEvento/:id", controllers.GetInscritosNoEvento)
-	r.GET("/eventos/:id/certificados",controllers.GerarCertificado)
-	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
-
-	r.GET("/cidades", controllers.ListarCidades)
-
-	r.GET("/fltroatividade", controllers.FiltrarAtividade)
-	r.GET("/fltroeventos", controllers.FiltrarEventos)
-	r.GET("/locais/disponiveis", controllers.ExibirLocaisDisponiveis)
-
-	r.POST("/controle-presenca/:id/presenca", controllers.RegistrarPresenca)
-	//r.GET("/gerarCertificado/:id", controllers.GerarCertificado)
-
-	r.GET("/atividade/:id/inscritos", controllers.ListarInscritosController)
-	r.GET("/listarPresencas", controllers.ListarPresencas)
-	r.GET("/listarPendente", controllers.ListarPresencaPendente)
-
+	r.GET("/locais-disponiveis", controllers.LocaisDisponiveisParaEvento)
 
 	// Grupo de rotas de usuário
 	user := r.Group("/usuario")
 	{
 		user.GET("/", controllers.ExibirUsuario)
+		// Rota para criar um novo usuário
 		user.POST("/", controllers.CriarNovoUsuario)
+
+		// Rota para buscar um usuário por ID
 		user.GET("/:id", controllers.BuscarUsuarioPorID)
+
+		// Rota para deletar um usuário
 		user.DELETE("/:id", controllers.DeleteUsuario)
+
+		// Rota para editar um usuário
 		user.PATCH("/:id", controllers.EditarUsuario)
+
+		// Rota para buscar um usuário por CPF
 		user.GET("usuario/cpf/:cpf", controllers.BuscarUsuarioPorCPF)
+	}
+
+	// Rota para criar administradores
+	r.POST("/criar-administrador", authentication.ValidarToken(), controllers.AdicionarAdministrador)
+
+	// Rotas para administração
+	adminGroup := r.Group("/admin")
+	{
+		adminGroup.Use(authentication.ValidarToken()) // Middleware para verificar se o usuário é autenticado como admin
+		adminGroup.GET("/users", controllers.ExibirUsuariosAdmin)
+		adminGroup.DELETE("/users/:id", controllers.DeletarUsuarioAdmin)
+		// Adicione outras rotas de administração conforme necessário...
 	}
 
 	// Grupo de rotas de estado
 	estado := r.Group("/estado")
 	{
 		estado.GET("/", controllers.ExibirEstado)
+
 		estado.POST("/", controllers.CriarNovoEstado)
 		estado.GET("/:id", controllers.BuscarEstadoPorID)
 		estado.DELETE("/:id", controllers.DeleteEstado)
@@ -158,6 +168,28 @@ func HandleRequests() {
 		tipoAtividades.DELETE("/:id", controllers.DeleteTipoAtividade)
 		tipoAtividades.PATCH("/:id", controllers.EditarTipoAtividade)
 	}
+
+	// Rota para obter relatório de inscritos por atividade
+	r.GET("/relatorio_inscritos_por_atividade/:id", controllers.RelatorioInscritosEmAtividade)
+
+	r.POST("/usuario/inicia-recuperacao-senha/:id", controllers.IniciaRecuperacaoSenha)
+
+	r.GET("/inscritosEvento/:id", controllers.GetInscritosNoEvento)
+
+	r.GET("/eventos/:id/certificados", controllers.GerarCertificado)
+
+	r.GET("/cidades", controllers.ListarCidades)
+
+	r.GET("/fltroatividade", controllers.FiltrarAtividade)
+	r.GET("/fltroeventos", controllers.FiltrarEventos)
+	r.GET("/locais/disponiveis", controllers.ExibirLocaisDisponiveis)
+
+	r.POST("/controle-presenca/:id/presenca", controllers.RegistrarPresenca)
+	//r.GET("/gerarCertificado/:id", controllers.GerarCertificado)
+
+	r.GET("/atividade/:id/inscritos", controllers.ListarInscritosController)
+	r.GET("/listarPresencas", controllers.ListarPresencas)
+	r.GET("/listarPendente", controllers.ListarPresencaPendente)
 
 	r.Run(":8080")
 

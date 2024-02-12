@@ -2,17 +2,16 @@ package models
 
 import (
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 type Local struct {
 	gorm.Model
-	Status      string    `json:"status,omitempty"`
-	Sala        string    `json:"sala,omitempty"`
-	Setor       string    `json:"setor,omitempty"`
-	DataHoraFim time.Time `json:"dataHoraFim,omitempty"`
+	Status      string `json:"status,omitempty"`
+	Sala        string `json:"sala,omitempty"`
+	Setor       string `json:"setor,omitempty"`
+	DataHoraFim string `json:"dataHoraFim,omitempty"`
 }
 
 func (local *Local) Preparar() error {
@@ -32,14 +31,6 @@ func (local *Local) ValidateLocal() error {
 		return errors.New("status é obrigatório")
 	}
 
-	// if local.Status == "Disponível" {
-	// 	// Verifica se a sala já está reservada para outro evento
-	// 	for _, evento := range local.Eventos {
-	// 		if evento.HoraInicio.Before(local.DataHoraFim) && evento.HoraFim.After(local.DataHoraFim) {
-	// 			return errors.New("Sala já está reservada para outro evento no mesmo dia e horário")
-	// 		}
-	// 	}
-	// }
 	if local.Status != "ativo" && local.Status != "inativo" {
 		return errors.New("status é obrigatório")
 	}

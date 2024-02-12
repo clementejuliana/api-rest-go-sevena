@@ -9,14 +9,14 @@ import (
 
 type Evento struct {
 	gorm.Model
-	Status     string    `json:"status,omitempty"`
-	Nome       string    `json:"nome,omitempty"`
-	Descricao  string    `json:"descricao,omitempty"`
-	DataInicio time.Time `json:"data_inicio,omitempty"`
-	DataFinal  time.Time `json:"data_final,omitempty"`
-	LocalID    int       `json:"local_id" gorm:"foreignKey:LocalID"`
-	HoraInicio time.Time `json:"horaInicio"`
-	HoraFim    time.Time `json:"horaFim"`
+	Status     string `json:"status,omitempty"`
+	Nome       string `json:"nome,omitempty"`
+	Descricao  string `json:"descricao,omitempty"`
+	DataInicio string `json:"data_inicio,omitempty"`
+	DataFinal  string `json:"data_final,omitempty"`
+	LocalID    int    `json:"local_id" gorm:"foreignKey:LocalID"`
+	HoraInicio string `json:"horaInicio,omitempty"`
+	HoraFim    string `json:"horaFim,omitempty"`
 }
 
 func (evento *Evento) Preparar(db *gorm.DB) error {
@@ -31,10 +31,10 @@ func (evento *Evento) Preparar(db *gorm.DB) error {
 		return err
 	}
 
-	_, err = evento.HorariosDisponiveis(db)
-	if err != nil {
-		return err
-	}
+	// _, err = evento.HorariosDisponiveis(db)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -56,14 +56,26 @@ func (e *Evento) ValidarEvento() error {
 	if e.Descricao == "" {
 		return errors.New("descrição é obrigatória")
 	}
-	if len(e.Descricao) < 100 {
+	if len(e.Descricao) < 50 {
 		return errors.New("descrição deve ter pelo menos 100 caracteres")
 	}
 	if len(e.Descricao) > 10000 {
 		return errors.New("descrição deve ter no máximo 10.000 caracteres")
 	}
-	if e.DataInicio.After(e.DataFinal) {
-		return errors.New("data de inicio deve ser antes de data final do evento")
+	// Converte as strings de data para objetos time.Time
+	dataInicio, err := time.Parse("02/01/2006", e.DataInicio)
+	if err != nil {
+		return errors.New("data de início inválida")
+	}
+
+	dataFinal, err := time.Parse("02/01/2006", e.DataFinal)
+	if err != nil {
+		return errors.New("data final inválida")
+	}
+
+	// Validação para garantir que a data de início seja anterior à data final
+	if dataInicio.After(dataFinal) {
+		return errors.New("data de início deve ser anterior à data final do evento")
 	}
 	if e.LocalID == 0 {
 		return errors.New("local  é obrigatório")
@@ -90,33 +102,33 @@ func (e *Evento) VerificarConflitosHorario(db *gorm.DB) error {
 	return nil
 }
 
-func (evento *Evento) HorariosDisponiveis(db *gorm.DB) ([]Evento, error) {
-	var eventos []Evento
-	err := db.Where("local_id = ? AND (data_inicio >= ? AND  data_final<= ?)", evento.LocalID, evento.DataInicio, evento.DataFinal).
-		Find(&eventos).Error
-	if err != nil {
-		return nil, err
-	}
+// func (evento *Evento) HorariosDisponiveis(db *gorm.DB) ([]Evento, error) {
+// 	var eventos []Evento
+// 	err := db.Where("local_id = ? AND (data_inicio >= ? AND  data_final<= ?)", evento.LocalID, evento.DataInicio, evento.DataFinal).
+// 		Find(&eventos).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	// Crie uma lista de intervalos de tempo ocupados pelos eventos existentes
-	var intervalosDeTempoOcupados []time.Time
-	for _, evento := range eventos {
-		intervalosDeTempoOcupados = append(intervalosDeTempoOcupados, evento.DataInicio, evento.DataFinal)
-	}
-	// Crie uma lista de horários disponíveis
-	var horariosDisponiveis []Evento
-	for horaInicio := time.Now(); horaInicio.Before(evento.DataFinal); horaInicio = horaInicio.Add(time.Hour) {
-		horariosDisponiveis = append(horariosDisponiveis, Evento{HoraInicio: horaInicio, HoraFim: horaInicio.Add(time.Hour)})
-	}
-	// Exclua os horários ocupados da lista de horários disponíveis
-	for _, intervaloDeTempoOcupado := range intervalosDeTempoOcupados {
-		for i, horarioDisponivel := range horariosDisponiveis {
-			if intervaloDeTempoOcupado.After(horarioDisponivel.HoraInicio) && intervaloDeTempoOcupado.Before(horarioDisponivel.HoraFim) {
-				horariosDisponiveis = append(horariosDisponiveis[:i], horariosDisponiveis[i+1:]...)
-			}
-		}
-	}
+// 	// Crie uma lista de intervalos de tempo ocupados pelos eventos existentes
+// 	var intervalosDeTempoOcupados []time.Time
+// 	for _, evento := range eventos {
+// 		intervalosDeTempoOcupados = append(intervalosDeTempoOcupados, evento.DataInicio, evento.DataFinal)
+// 	}
+// 	// Crie uma lista de horários disponíveis
+// 	var horariosDisponiveis []Evento
+// 	for horaInicio := time.Now(); horaInicio.Before(evento.DataFinal); horaInicio = horaInicio.Add(time.Hour) {
+// 		horariosDisponiveis = append(horariosDisponiveis, Evento{HoraInicio: horaInicio, HoraFim: horaInicio.Add(time.Hour)})
+// 	}
+// 	// Exclua os horários ocupados da lista de horários disponíveis
+// 	for _, intervaloDeTempoOcupado := range intervalosDeTempoOcupados {
+// 		for i, horarioDisponivel := range horariosDisponiveis {
+// 			if intervaloDeTempoOcupado.After(horarioDisponivel.HoraInicio) && intervaloDeTempoOcupado.Before(horarioDisponivel.HoraFim) {
+// 				horariosDisponiveis = append(horariosDisponiveis[:i], horariosDisponiveis[i+1:]...)
+// 			}
+// 		}
+// 	}
 
-	// Retorne os horários disponíveis restantes
-	return horariosDisponiveis, nil
-}
+// 	// Retorne os horários disponíveis restantes
+// 	return horariosDisponiveis, nil
+// }

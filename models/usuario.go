@@ -4,30 +4,31 @@ import (
 	"errors"
 	"regexp"
 	"strings"
-	"time"
+
 
 	"gorm.io/gorm"
 )
 
 type Usuario struct {
 	gorm.Model
-	Status         string        `json:"status,omitempty"`
-	Nome           string        `json:"nome,omitempty"`
-	CPF            string        `json:"cpf,omitempty"`
-	RG             string        `json:"rg,omitempty"`
-	Genero         string        `json:"genero"`
-	DataNascimento time.Time     `json:"data_nascimento"`
-	Email          string        `json:"email,omitempty"`
-	Senha          string        `json:"senha,omitempty"`
-	Telefone       string        `json:"telefone,omitempty"`
-	Escolaridade   string        `json:"escolaridade"`
-	Profissao      string        `json:"profissao"`
-	FotoPerfil     string        `json:"foto_perfil,omitempty"`
-	TipoUsuarioID  int           `json:"tipo_usuario_id,omitempty"`
-	InstituicaoID  int           `json:"instituicao_id,omitempty"`
-	CidadeID       int           `json:"cidadeid,omitempty"`
-	
+	Status         string `json:"status,omitempty"`
+	Nome           string `json:"nome,omitempty"`
+	CPF            string `json:"cpf,omitempty"`
+	RG             string `json:"rg,omitempty"`
+	Genero         string `json:"genero"`
+	DataNascimento string `json:"data_nascimento"`
+	Email          string `json:"email,omitempty"`
+	Senha          string `json:"senha,omitempty"`
+	Telefone       string `json:"telefone,omitempty"`
+	Escolaridade   string `json:"escolaridade"`
+	Profissao      string `json:"profissao"`
+	FotoPerfil     string `json:"foto_perfil,omitempty"`
+	TipoUsuarioID  int    `json:"tipo_usuario_id,omitempty"`
+	InstituicaoID  int    `json:"instituicao_id,omitempty"`
+	CidadeID       int    `json:"cidadeid,omitempty"`
+	Papel          string `json:"papel,omitempty"` // Novo campo para representar o papel do usuário
 }
+
 
 func (usuario *Usuario) Preparar() error {
 	// Chama a função ValidarUsuario()
@@ -45,6 +46,7 @@ func (usuario Usuario) ValidarUsuario() error {
 	rgRegexp := regexp.MustCompile("[0-9]{2}.?[0-9]{3}.?[0-9]{3}-?[0-9]{1}")
 	nomere := regexp.MustCompile("^[a-zA-Záàâãéêíóôõúçñ ]+$")
 	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	dnRegex := regexp.MustCompile(`^([0-2][0-9]|(3)[0-1])(\/|-)([0][1-9]|[1][0-2])(\/|-)([1-2][0-9][0-9][0-9])$`)
 
 	// Valida o status
 	if usuario.Status != "ativo" && usuario.Status != "inativo" {
@@ -73,7 +75,9 @@ func (usuario Usuario) ValidarUsuario() error {
 	}
 
 	// Valida a data de nascimento
-	if usuario.DataNascimento.IsZero() {
+	// Data de nascimento a ser validada
+   // dataNascimento := "10/02/2000"
+	if !dnRegex.MatchString(usuario.DataNascimento) {
 		return errors.New("data de nascimento inválida")
 	}
 
@@ -140,6 +144,7 @@ func (usuario *Usuario) formatar() {
 	usuario.CPF = strings.Trim(usuario.CPF, "")
 	usuario.Email = strings.Trim(usuario.Email, "")
 	usuario.RG = strings.Trim(usuario.RG, "")
+	usuario.DataNascimento = strings.Trim(usuario.DataNascimento, "")
 }
 
 func (u *Usuario) GetUsuariosInscritos(db *gorm.DB, eventoID uint) ([]Usuario, error) {
@@ -150,3 +155,5 @@ func (u *Usuario) GetUsuariosInscritos(db *gorm.DB, eventoID uint) ([]Usuario, e
 	}
 	return usuarios, nil
 }
+
+

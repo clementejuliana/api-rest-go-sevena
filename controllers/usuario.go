@@ -142,3 +142,6 @@ func IniciaRecuperacaoSenha(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Processo de recuperação de senha iniciado com sucesso"})
 }
+
+
+

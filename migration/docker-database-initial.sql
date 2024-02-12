@@ -61,7 +61,7 @@ CREATE TABLE usuario
     cpf VARCHAR(15) NOT NULL,
     rg VARCHAR(15) NOT NULL,
     genero VARCHAR(255) NOT NULL,
-    data_nascimento timestamp NOT NULL,
+    data_nascimento VARCHAR(255)NOT NULL,
     email VARCHAR(255) NOT NULL,
     telefone VARCHAR(255) NOT NULL,
     escolaridade VARCHAR(255) NOT NULL,

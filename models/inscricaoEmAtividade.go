@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
+	"regexp"
 	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -11,8 +13,8 @@ type InscricaoEmAtividade struct {
 	AtividadeID        int               `json:"atividade_id,omitempty"`
 	EventoID           int               `json:"evento_id,omitempty"`
 	Status             string            `json:"status,omitempty"`
-	Data               time.Time         `json:"data,omitempty"`
-	Hora               time.Time         `json:"hora,omitempty"`
+	Data               string            `json:"data,omitempty"`
+	Hora               string            `json:"hora,omitempty"`
 	ControlePresencaID uint              `json:"controle_presenca_id,omitempty" gorm:"foreignKey:ControlePresenca"`
 	ControlePresenca   *ControlePresenca `json:"controle_presenca,omitempty"`
 	UsuarioID          int               `json:"usuario_id,omitempty"`
@@ -53,14 +55,14 @@ func (i *InscricaoEmAtividade) ValidarInscricaoAtividade() error {
 		return errors.New("status deve ser 'pendente', 'confirmada' ou 'cancelada'")
 	}
 
-	// Verifica se a data é válida
-	if i.Data.IsZero() {
-		return errors.New("data é obrigatória")
+	// Validação para aceitar apenas números na data
+	if match, _ := regexp.MatchString("[0-9]{2}/[0-9]{2}/[0-9]{4}$", i.Data); !match {
+		return errors.New("data deve conter apenas números")
 	}
 
-	// Verifica se a hora é válida
-	if i.Hora.IsZero() {
-		return errors.New("hora é obrigatória")
+	// Validação para aceitar apenas números na hora
+	if match, _ := regexp.MatchString("[0-9]{2}:[0-9]{2}$", i.Hora); !match {
+		return errors.New("hora deve conter apenas números")
 	}
 
 	// Verifica se o controle de presença é válido
@@ -72,20 +74,36 @@ func (i *InscricaoEmAtividade) ValidarInscricaoAtividade() error {
 	return nil
 }
 
-func (i *InscricaoEmAtividade) VerificarConflitoHorario(db *gorm.DB) error {
-	// Consulta para verificar conflito de horário
-	var count int64
-	result := db.Model(&InscricaoEmAtividade{}).
-		Where("Evento_ID = ? AND Data = ? AND ((Hora >= ? AND Hora < ?) OR (Hora <= ? AND ? < Hora))",
-			i.EventoID, i.Data, i.Hora, i.Hora.Add(time.Hour), i.Hora, i.Hora.Add(time.Hour)).
-		Count(&count)
+func (inscricaoA *InscricaoEmAtividade) VerificarConflitoHorario(db *gorm.DB) error {
+	var inscricoes []InscricaoEmAtividade
 
-	if result.Error != nil {
-		return result.Error
+	// Busca todas as inscrições do usuário no mesmo dia
+	db.Where("usuario_id = ? AND data = ?", inscricaoA.UsuarioID, inscricaoA.Data).Find(&inscricoes)
+
+	// Converte a hora de início da inscrição atual para um objeto Time
+	horaInicioAtual, err := time.Parse("15:04", inscricaoA.Hora)
+	if err != nil {
+		return errors.New("hora de início inválida")
 	}
 
-	if count > 0 {
-		return errors.New("conflito de horário com outra inscrição")
+	// Calcula a hora de término da inscrição atual com base na hora de início e na duração da atividade (vamos assumir que a duração é de 1 hora)
+	horaTerminoAtual := horaInicioAtual.Add(time.Hour)
+
+	for _, inscricao := range inscricoes {
+		// Converte a hora de início da inscrição existente para um objeto Time
+		horaInicioExistente, err := time.Parse("15:04", inscricao.Hora)
+		if err != nil {
+			return errors.New("hora de início existente inválida")
+		}
+
+		// Calcula a hora de término da inscrição existente com base na hora de início e na duração da atividade (assumindo 1 hora)
+		horaTerminoExistente := horaInicioExistente.Add(time.Hour)
+
+		// Verifica se há sobreposição entre as atividades
+		if (horaInicioAtual.Before(horaTerminoExistente) && horaTerminoAtual.After(horaInicioExistente)) ||
+			(horaInicioExistente.Before(horaTerminoAtual) && horaTerminoExistente.After(horaInicioAtual)) {
+			return errors.New("conflito de horário detectado")
+		}
 	}
 
 	return nil
