@@ -63,12 +63,12 @@ func (e *Evento) ValidarEvento() error {
 		return errors.New("descrição deve ter no máximo 10.000 caracteres")
 	}
 	// Converte as strings de data para objetos time.Time
-	dataInicio, err := time.Parse("02/01/2006", e.DataInicio)
+	dataInicio, err := time.Parse("2006-01-02", e.DataInicio)
 	if err != nil {
 		return errors.New("data de início inválida")
 	}
 
-	dataFinal, err := time.Parse("02/01/2006", e.DataFinal)
+	dataFinal, err := time.Parse("2006-01-02", e.DataFinal)
 	if err != nil {
 		return errors.New("data final inválida")
 	}

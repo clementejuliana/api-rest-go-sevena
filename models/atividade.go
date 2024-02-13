@@ -45,12 +45,12 @@ type Intervalo struct {
 }
 
 func (a *Atividade) ValidarAtividade() error {
-	now := time.Now()
+	
 
 	if a.Status != "ativo" && a.Status != "inativo" {
 		return errors.New("status é obrigatório")
 	}
-	
+
 	if a.Titulo == "" {
 		return errors.New("titulo é obrigatório")
 	}
@@ -58,11 +58,7 @@ func (a *Atividade) ValidarAtividade() error {
 		return errors.New("resumo é obrigatório")
 	}
 
-	// Validar a data
-	data, err := time.Parse("02/01/2006", a.Data)
-	if err != nil || data.Before(now) {
-		return errors.New("data é obrigatória e deve estar no futuro")
-	}
+
 
 	// // Validar a hora de início
 	// horaInicio, err := time.Parse("15:04", a.HoraInicio)

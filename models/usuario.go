@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-
 	"gorm.io/gorm"
 )
 
@@ -29,7 +28,6 @@ type Usuario struct {
 	Papel          string `json:"papel,omitempty"` // Novo campo para representar o papel do usuário
 }
 
-
 func (usuario *Usuario) Preparar() error {
 	// Chama a função ValidarUsuario()
 	err := usuario.ValidarUsuario()
@@ -46,7 +44,7 @@ func (usuario Usuario) ValidarUsuario() error {
 	rgRegexp := regexp.MustCompile("[0-9]{2}.?[0-9]{3}.?[0-9]{3}-?[0-9]{1}")
 	nomere := regexp.MustCompile("^[a-zA-Záàâãéêíóôõúçñ ]+$")
 	emailRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	dnRegex := regexp.MustCompile(`^([0-2][0-9]|(3)[0-1])(\/|-)([0][1-9]|[1][0-2])(\/|-)([1-2][0-9][0-9][0-9])$`)
+	// dnRegex := regexp.MustCompile(`^([0-2][0-9]|(3)[0-1])\-([0][1-9]|[1][0-2])\-([0-9]{4})$`)
 
 	// Valida o status
 	if usuario.Status != "ativo" && usuario.Status != "inativo" {
@@ -76,10 +74,11 @@ func (usuario Usuario) ValidarUsuario() error {
 
 	// Valida a data de nascimento
 	// Data de nascimento a ser validada
-   // dataNascimento := "10/02/2000"
-	if !dnRegex.MatchString(usuario.DataNascimento) {
-		return errors.New("data de nascimento inválida")
-	}
+	// dataNascimento := "10/02/2000"
+
+	// if !dnRegex.MatchString(usuario.DataNascimento) {
+	// 	return errors.New("data de nascimento inválida")
+	// }
 
 	// Valida o e-mail
 	if !emailRegex.MatchString(usuario.Email) {
@@ -155,5 +154,3 @@ func (u *Usuario) GetUsuariosInscritos(db *gorm.DB, eventoID uint) ([]Usuario, e
 	}
 	return usuarios, nil
 }
-
-
